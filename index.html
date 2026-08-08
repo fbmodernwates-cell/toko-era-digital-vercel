@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOKO ERA DIGITAL - Gabung Mitra Dapatkan Toko Online</title>
+    <style>
+        /* Design System Tokens */
+        :root {
+            --success-green: #166534;
+            --deep-green-link: #14532D;
+            --soft-slate-bg: #F4F6F8;
+            --ink-black: #000000;
+            --neutral-border: #D1D5DB;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --radius-button: 6px;
+            --radius-standard: 12px;
+            --spacing-unit: 4px;
+        }
+
+        /* Reset & Base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--soft-slate-bg);
+            color: var(--ink-black);
+            line-height: 1.6;
+            padding: var(--spacing-unit) calc(var(--spacing-unit) * 4);
+        }
+
+        /* Layout */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+            padding-top: calc(var(--spacing-unit) * 8);
+        }
+
+        /* Media Section */
+        .media-section {
+            margin-bottom: calc(var(--spacing-unit) * 8);
+        }
+
+        .media-section video,
+        .media-section img {
+            max-width: 100%;
+            height: auto;
+            border-radius: var(--radius-standard);
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* Hero Content */
+        .hero {
+            margin-bottom: calc(var(--spacing-unit) * 8);
+        }
+
+        .hero h1 {
+            font-size: 1.5rem; /* 24px approximate, but keeping compact per spec */
+            font-weight: 600;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+        }
+
+        .hero p.lead {
+            font-size: 1rem;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+            opacity: 0.8;
+        }
+
+        .social-proof {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+            color: var(--success-green);
+        }
+
+        /* CTA Button */
+        .cta-button {
+            display: inline-block;
+            background-color: var(--success-green);
+            color: white;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: calc(var(--spacing-unit) * 3) calc(var(--spacing-unit) * 6);
+            border-radius: var(--radius-button);
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+
+        .cta-button:hover {
+            background-color: var(--deep-green-link);
+        }
+
+        /* Benefits Section */
+        .benefits {
+            margin-top: calc(var(--spacing-unit) * 8);
+            text-align: left;
+        }
+
+        .benefits h2 {
+            font-size: 1.25rem;
+            margin-bottom: calc(var(--spacing-unit) * 4);
+        }
+
+        .benefits ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .benefits li {
+            margin-bottom: calc(var(--spacing-unit) * 2);
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .benefits li::before {
+            content: "•";
+            color: var(--success-green);
+            margin-right: calc(var(--spacing-unit) * 2);
+            font-size: 1.5rem;
+            line-height: 1;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: calc(var(--spacing-unit) * 8);
+            font-size: 0.875rem;
+            color: var(--ink-black);
+            opacity: 0.6;
+        }
+
+        .footer a {
+            color: var(--deep-green-link);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: var(--spacing-unit) calc(var(--spacing-unit) * 2);
+            }
+
+            .hero h1 {
+                font-size: 1.25rem;
+            }
+
+            .social-proof {
+                font-size: 1.125rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Media Section (Top) -->
+        <section class="media-section">
+            <!-- Placeholder for video or image - replace with actual media -->
+            <img src="https://via.placeholder.com/800x400?media=Tanpa+Plastik+Video+Thumbnail" alt="TKO ERA DIGITAL - Solusi Toko Online Tanpa Sampah Plastik" loading="lazy">
+            <!-- For video, you could use:
+            <video controls poster="placeholder.jpg">
+                <source src="video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            -->
+        </section>
+
+        <!-- Hero Section -->
+        <section class="hero">
+            <h1>Bantu UMKM Indonesia Bergerak TOKO ERA DIGITAL</h1>
+            <p class="lead">Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TKO ERA DIGITAL.</p>
+            <div class="social-proof">
+                2.651 UMKM sudah bergabung dengan TKO ERA DIGITAL
+            </div>
+            <a href="#join" class="cta-button">GABUNG SEKARANG</a>
+        </section>
+
+        <!-- Benefits Section -->
+        <section class="benefits">
+            <h2>Mengapa Bergabung dengan TKO ERA DIGITAL?</h2>
+            <ul>
+                <li>Toko online siap pakai tanpa biaya awal</li>
+                <li>Pembayaran terintegrasi dan sistem pengelolaan pesanan</li>
+                <li>Akses komunitas UMKM berkelanjutan dan pelatihan gratis</li>
+                <li>Dukungan teknis dan marketing untuk meningkatkan penjualan</li>
+            </ul>
+        </section>
+
+        <!-- Join Call-to-Action (Repeat for emphasis) -->
+        <section class="hero" style="margin-top: calc(var(--spacing-unit) * 8);">
+            <a href="#join" class="cta-button" style="padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 8); font-size: 1.125rem;">
+                YUK, GABUNG MITRA TKO ERA DIGITAL!
+            </a>
+        </section>
+
+        <footer class="footer">
+            <p>TKO ERA DIGITAL &copy; 2026. Semua hak dilindungi.</p>
+            <p>
+                <a href="#">Kebijakan Privasi</a> |
+                <a href="#">Syarat Layanan</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
