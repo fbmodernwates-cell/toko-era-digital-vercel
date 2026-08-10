@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOKO ERA DIGITAL - Gabung Mitra Dapatkan Toko Online</title>
+    <meta name="description" content="Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TOKO ERA DIGITAL. 2.651 UMKM sudah bergabung.">
     <style>
         /* Design System Tokens */
         :root {
@@ -46,13 +47,13 @@
             margin-bottom: calc(var(--spacing-unit) * 8);
         }
 
-        .media-section video,
-        .media-section img {
+        .media-section svg {
             max-width: 100%;
             height: auto;
             border-radius: var(--radius-standard);
             display: block;
             margin: 0 auto;
+            background: linear-gradient(135deg, #14532D 0%, #166534 45%, #4ADE80 100%);
         }
 
         /* Hero Content */
@@ -98,6 +99,15 @@
             background-color: var(--deep-green-link);
         }
 
+        .cta-button-wa {
+            background-color: #25D366;
+            color: #ffffff;
+        }
+
+        .cta-button-wa:hover {
+            background-color: #1DA851;
+        }
+
         /* Benefits Section */
         .benefits {
             margin-top: calc(var(--spacing-unit) * 8);
@@ -126,6 +136,26 @@
             margin-right: calc(var(--spacing-unit) * 2);
             font-size: 1.5rem;
             line-height: 1;
+        }
+
+        /* Join Section */
+        .join {
+            margin-top: calc(var(--spacing-unit) * 8);
+            background-color: #ffffff;
+            border: 1px solid var(--neutral-border);
+            border-radius: var(--radius-standard);
+            padding: calc(var(--spacing-unit) * 6);
+            text-align: center;
+        }
+
+        .join h2 {
+            font-size: 1.25rem;
+            margin-bottom: calc(var(--spacing-unit) * 2);
+        }
+
+        .join p {
+            margin-bottom: calc(var(--spacing-unit) * 4);
+            opacity: 0.8;
         }
 
         /* Footer */
@@ -158,6 +188,10 @@
             .social-proof {
                 font-size: 1.125rem;
             }
+
+            .join {
+                padding: calc(var(--spacing-unit) * 4);
+            }
         }
     </style>
 </head>
@@ -165,29 +199,34 @@
     <div class="container">
         <!-- Media Section (Top) -->
         <section class="media-section">
-            <!-- Placeholder for video or image - replace with actual media -->
-            <img src="https://via.placeholder.com/800x400?media=Tanpa+Plastik+Video+Thumbnail" alt="TKO ERA DIGITAL - Solusi Toko Online Tanpa Sampah Plastik" loading="lazy">
-            <!-- For video, you could use:
-            <video controls poster="placeholder.jpg">
-                <source src="video.mp4" type="video/mp4">
-                Your browser does not support the video tag.
-            </video>
-            -->
+            <svg viewBox="0 0 800 400" role="img" aria-label="TOKO ERA DIGITAL - Solusi Toko Online Tanpa Sampah Plastik">
+                <rect width="800" height="400" fill="url(#bgGradient)"/>
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#14532D"/>
+                        <stop offset="100%" stop-color="#166534"/>
+                    </linearGradient>
+                </defs>
+                <text x="400" y="180" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#FFFFFF">TOKO ERA DIGITAL</text>
+                <text x="400" y="230" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#BBF7D0">Solusi Toko Online Tanpa Sampah Plastik</text>
+                <rect x="300" y="270" width="200" height="48" rx="24" fill="#25D366"/>
+                <text x="400" y="301" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="600" fill="#FFFFFF">GABUNG SEKARANG</text>
+            </svg>
         </section>
 
         <!-- Hero Section -->
         <section class="hero">
             <h1>Bantu UMKM Indonesia Bergerak TOKO ERA DIGITAL</h1>
-            <p class="lead">Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TKO ERA DIGITAL.</p>
+            <p class="lead">Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TOKO ERA DIGITAL.</p>
             <div class="social-proof">
-                2.651 UMKM sudah bergabung dengan TKO ERA DIGITAL
+                2.651 UMKM sudah bergabung dengan TOKO ERA DIGITAL
             </div>
-            <a href="#join" class="cta-button">GABUNG SEKARANG</a>
+            <a href="https://wa.me/6285123726941?text=Halo%20Toko%20Era%20Digital%2C%20saya%20ingin%20bergabung%20sebagai%20mitra%20UMKM." class="cta-button cta-button-wa" target="_blank" rel="noopener">GABUNG SEKARANG VIA WHATSAPP</a>
         </section>
 
         <!-- Benefits Section -->
         <section class="benefits">
-            <h2>Mengapa Bergabung dengan TKO ERA DIGITAL?</h2>
+            <h2>Mengapa Bergabung dengan TOKO ERA DIGITAL?</h2>
             <ul>
                 <li>Toko online siap pakai tanpa biaya awal</li>
                 <li>Pembayaran terintegrasi dan sistem pengelolaan pesanan</li>
@@ -196,15 +235,15 @@
             </ul>
         </section>
 
-        <!-- Join Call-to-Action (Repeat for emphasis) -->
-        <section class="hero" style="margin-top: calc(var(--spacing-unit) * 8);">
-            <a href="#join" class="cta-button" style="padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 8); font-size: 1.125rem;">
-                YUK, GABUNG MITRA TKO ERA DIGITAL!
-            </a>
+        <!-- Join Section -->
+        <section class="join" id="join">
+            <h2>Yuk, Gabung Mitra TOKO ERA DIGITAL!</h2>
+            <p>Klik tombol di bawah dan langsung chat admin kami melalui WhatsApp untuk proses pendaftaran yang cepat dan mudah.</p>
+            <a href="https://wa.me/6285123726941?text=Halo%20Toko%20Era%20Digital%2C%20saya%20ingin%20bergabung%20sebagai%20mitra%20UMKM." class="cta-button cta-button-wa" target="_blank" rel="noopener">CHAT ADMIN VIA WHATSAPP</a>
         </section>
 
         <footer class="footer">
-            <p>TKO ERA DIGITAL &copy; 2026. Semua hak dilindungi.</p>
+            <p>TOKO ERA DIGITAL &copy; 2026. Semua hak dilindungi.</p>
             <p>
                 <a href="#">Kebijakan Privasi</a> |
                 <a href="#">Syarat Layanan</a>
