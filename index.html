@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOKO ERA DIGITAL - Gabung Mitra Dapatkan Toko Online</title>
-    <meta name="description" content="Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TOKO ERA DIGITAL. 2.651 UMKM sudah bergabung.">
+    <meta name="description" content="Toko online seumur hidup dengan modal Rp350 ribu. Dapatkan toko online lengkap + voucher umroh hingga Rp700.000 bersama TOKO ERA DIGITAL.">
     <style>
         /* Design System Tokens */
         :root {
-            --success-green: #166534;
-            --deep-green-link: #14532D;
-            --soft-slate-bg: #F4F6F8;
+            --success-green: #D2691E;
+            --deep-green-link: #8B4513;
+            --soft-slate-bg: #F5DEB9;
             --ink-black: #000000;
             --neutral-border: #D1D5DB;
             --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,6 +34,59 @@
             padding: var(--spacing-unit) calc(var(--spacing-unit) * 4);
         }
 
+        /* Top Navbar */
+        .top-nav {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: calc(var(--spacing-unit) * 3) 0;
+            gap: var(--spacing-unit);
+        }
+
+        .top-nav .brand {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--deep-green-link);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: var(--spacing-unit);
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .nav-link-btn {
+            display: inline-block;
+            padding: calc(var(--spacing-unit) * 1.5) calc(var(--spacing-unit) * 4);
+            border-radius: var(--radius-button);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            border: 1px solid var(--deep-green-link);
+            color: var(--deep-green-link);
+            transition: all 0.2s;
+        }
+
+        .nav-link-btn:hover {
+            background: var(--deep-green-link);
+            color: white;
+        }
+
+        .nav-link-btn.primary {
+            background-color: var(--success-green);
+            border-color: var(--success-green);
+            color: white;
+        }
+
+        .nav-link-btn.primary:hover {
+            background-color: var(--deep-green-link);
+        }
+
         /* Layout */
         .container {
             max-width: 800px;
@@ -47,13 +100,13 @@
             margin-bottom: calc(var(--spacing-unit) * 8);
         }
 
-        .media-section svg {
+        .media-section video,
+        .media-section img {
             max-width: 100%;
             height: auto;
             border-radius: var(--radius-standard);
             display: block;
             margin: 0 auto;
-            background: linear-gradient(135deg, #14532D 0%, #166534 45%, #4ADE80 100%);
         }
 
         /* Hero Content */
@@ -62,7 +115,7 @@
         }
 
         .hero h1 {
-            font-size: 1.5rem; /* 24px approximate, but keeping compact per spec */
+            font-size: 1.5rem;
             font-weight: 600;
             margin-bottom: calc(var(--spacing-unit) * 4);
         }
@@ -99,15 +152,6 @@
             background-color: var(--deep-green-link);
         }
 
-        .cta-button-wa {
-            background-color: #25D366;
-            color: #ffffff;
-        }
-
-        .cta-button-wa:hover {
-            background-color: #1DA851;
-        }
-
         /* Benefits Section */
         .benefits {
             margin-top: calc(var(--spacing-unit) * 8);
@@ -138,32 +182,13 @@
             line-height: 1;
         }
 
-        /* Join Section */
-        .join {
-            margin-top: calc(var(--spacing-unit) * 8);
-            background-color: #ffffff;
-            border: 1px solid var(--neutral-border);
-            border-radius: var(--radius-standard);
-            padding: calc(var(--spacing-unit) * 6);
-            text-align: center;
-        }
-
-        .join h2 {
-            font-size: 1.25rem;
-            margin-bottom: calc(var(--spacing-unit) * 2);
-        }
-
-        .join p {
-            margin-bottom: calc(var(--spacing-unit) * 4);
-            opacity: 0.8;
-        }
-
         /* Footer */
         .footer {
             margin-top: calc(var(--spacing-unit) * 8);
             font-size: 0.875rem;
             color: var(--ink-black);
             opacity: 0.6;
+            text-align: center;
         }
 
         .footer a {
@@ -188,62 +213,105 @@
             .social-proof {
                 font-size: 1.125rem;
             }
-
-            .join {
-                padding: calc(var(--spacing-unit) * 4);
-            }
         }
     </style>
 </head>
 <body>
+    <nav class="top-nav">
+        <a class="brand" href="/">TOKO ERA DIGITAL</a>
+        <div class="nav-links">
+            <a class="nav-link-btn" href="/login">Login</a>
+            <a class="nav-link-btn primary" href="/register">Daftar Mitra</a>
+        </div>
+    </nav>
+
     <div class="container">
         <!-- Media Section (Top) -->
         <section class="media-section">
-            <svg viewBox="0 0 800 400" role="img" aria-label="TOKO ERA DIGITAL - Solusi Toko Online Tanpa Sampah Plastik">
-                <rect width="800" height="400" fill="url(#bgGradient)"/>
-                <defs>
-                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#14532D"/>
-                        <stop offset="100%" stop-color="#166534"/>
-                    </linearGradient>
-                </defs>
-                <text x="400" y="180" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="44" font-weight="700" fill="#FFFFFF">TOKO ERA DIGITAL</text>
-                <text x="400" y="230" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="22" fill="#BBF7D0">Solusi Toko Online Tanpa Sampah Plastik</text>
-                <rect x="300" y="270" width="200" height="48" rx="24" fill="#25D366"/>
-                <text x="400" y="301" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-size="18" font-weight="600" fill="#FFFFFF">GABUNG SEKARANG</text>
-            </svg>
+            <!-- Placeholder for video or image - replace with actual media -->
+            <!-- For video, you could use:
+            <video controls poster="placeholder.jpg">
+                <source src="video.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+            -->
         </section>
 
         <!-- Hero Section -->
         <section class="hero">
-            <h1>Bantu UMKM Indonesia Bergerak TOKO ERA DIGITAL</h1>
-            <p class="lead">Dapatkan toko online gratis dan solusi lengkap untuk berbisnis berkelanjutan dengan TOKO ERA DIGITAL.</p>
+            <h1>Toko Online Seumur Hidup dengan Modal Rp350 Ribu!</h1>
+            <p class="lead">Bayangkan: Modal Rp350.000 satu kali seumur hidup dapatkan toko online lengkap + voucher umroh hingga Rp700.000! That's 102x return on investment! Lebih efisien, lebih cepat, dan lebih mudah daripada toko konvensional.</p>
             <div class="social-proof">
-                2.651 UMKM sudah bergabung dengan TOKO ERA DIGITAL
+                Sudah 2.651+ UMKM percaya dan bergrowth bersama TOKO ERA DIGITAL
             </div>
-            <a href="https://wa.me/6285123726941?text=Halo%20Toko%20Era%20Digital%2C%20saya%20ingin%20bergabung%20sebagai%20mitra%20UMKM." class="cta-button cta-button-wa" target="_blank" rel="noopener">GABUNG SEKARANG VIA WHATSAPP</a>
+            <a href="/register" class="cta-button">Daftar Sekarang & Dapatkan Bonus!</a>
+        </section>
+
+        <!-- Special Offer Section -->
+        <section class="special-offer" style="background: white; padding: calc(var(--spacing-unit) * 6); margin-top: calc(var(--spacing-unit) * 4); border-radius: var(--radius-standard); box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: var(--success-green); margin-bottom: calc(var(--spacing-unit) * 3);">Penawaran Spesial Terbatas!</h2>
+            <div style="display: grid; gap: calc(var(--spacing-unit) * 3); grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
+                <div style="background: var(--soft-slate-bg); padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Modal Satu Kali Seumur Hidup</h3>
+                    <p style="margin: 0; font-size: 1.2rem; font-weight: bold; color: var(--success-green);">Rp350.000</p>
+                    <p style="margin: calc(var(--spacing-unit) * 2) 0 0 0; font-size: 0.9rem; color: #666;">Tidak ada biaya pendaftaran, tidak perlu perpanjang kontrak!</p>
+                </div>
+                <div style="background: var(--soft-slate-bg); padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Voucher Umroh Bonus</h3>
+                    <p style="margin: 0; font-size: 1.2rem; font-weight: bold; color: var(--success-green);">Hingga Rp700.000</p>
+                    <p style="margin: calc(var(--spacing-unit) * 2) 0 0 0; font-size: 0.9rem; color: #666;">Dapatkan hingga 102x return on investment!</p>
+                </div>
+                <div style="background: var(--soft-slate-bg); padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Bimbingan sampai Sukses</h3>
+                    <p style="margin: 0; font-size: 1.2rem; font-weight: bold; color: var(--success-green);">Full Support</p>
+                    <p style="margin: calc(var(--spacing-unit) * 2) 0 0 0; font-size: 0.9rem; color: #666;">Pembimbing khusus sampai Anda menghasilkan</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Why Choose Us Section -->
+        <section class="why-choose" style="padding: calc(var(--spacing-unit) * 6); background-color: var(--soft-slate-bg);">
+            <h2 style="text-align: center; color: var(--success-green); margin-bottom: calc(var(--spacing-unit) * 4);">Mengapa Memilih TOKO ERA DIGITAL?</h2>
+            <div style="display: grid; gap: calc(var(--spacing-unit) * 3); grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <div style="background: white; padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Berubah Bersama Teknologi</h3>
+                    <p style="margin: 0; color: #666; line-height: 1.6;">Zaman kita sudah berbeda dengan masa lalu. Tidak akan berubah nasib kecuali kita harus berubah mengikuti era teknologi. Kini saatnya beralih dari sistem offline ke digital untuk pertumbuhan yang lebih cepat!</p>
+                </div>
+                <div style="background: white; padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Kecepatan Tumbuh Luar Biasa</h3>
+                    <p style="margin: 0; color: #666; line-height: 1.6;">Dengan teknologi digitalisasi dan online, usaha Anda dapat tumbuh dan berkembang lebih cepat, lebih ringkas, dan lebih efisien dalam biaya, tenaga, dan waktu!</p>
+                </div>
+                <div style="background: white; padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Biaya Sangat Efisien</h3>
+                    <p style="margin: 0; color: #666; line-height: 1.6;">Bayangkan kontrak toko offline 10-30 juta per tahun vs hanya Rp350.000 satu kali seumur hidup! Hemat hingga 99% biaya operasi sambil mendapatkan hasil yang lebih baik.</p>
+                </div>
+                <div style="background: white; padding: calc(var(--spacing-unit) * 4); border-radius: var(--radius-button); box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center;">
+                    <h3 style="margin: 0 0 calc(var(--spacing-unit) * 2) 0; color: var(--ink-black);">Dukungan Penuh sampai Sukses</h3>
+                    <p style="margin: 0; color: #666; line-height: 1.6;">Kami bimbing dengan pendidikan dan pembimbing khusus sampai Anda benar-benar sukses dan menghasilkan. Tidak ada batas waktu - kami bersama Anda sampai mencapai tujuan!</p>
+                </div>
+            </div>
         </section>
 
         <!-- Benefits Section -->
         <section class="benefits">
-            <h2>Mengapa Bergabung dengan TOKO ERA DIGITAL?</h2>
+            <h2>Mengapa UMKM Memilih TOKO ERA DIGITAL?</h2>
             <ul>
-                <li>Toko online siap pakai tanpa biaya awal</li>
-                <li>Pembayaran terintegrasi dan sistem pengelolaan pesanan</li>
-                <li>Akses komunitas UMKM berkelanjutan dan pelatihan gratis</li>
-                <li>Dukungan teknis dan marketing untuk meningkatkan penjualan</li>
+                <li>Luncurkan toko online dalam hitungan menit - tidak perlu biaya pendaftaran</li>
+                <li>Semua transaksi terintegrasi: pembayaran, pesanan, dan inventarisasi terkelola secara otomatis</li>
+                <li>Gabung komunitas UMKM yang peduli lingkungan dengan akses pelatihan eksklusif</li>
+                <li>Dapatkan bantuan teknis tim ahli serta strategi pemasaran yang efektif untuk naikkan omzet</li>
             </ul>
         </section>
 
-        <!-- Join Section -->
-        <section class="join" id="join">
-            <h2>Yuk, Gabung Mitra TOKO ERA DIGITAL!</h2>
-            <p>Klik tombol di bawah dan langsung chat admin kami melalui WhatsApp untuk proses pendaftaran yang cepat dan mudah.</p>
-            <a href="https://wa.me/6285123726941?text=Halo%20Toko%20Era%20Digital%2C%20saya%20ingin%20bergabung%20sebagai%20mitra%20UMKM." class="cta-button cta-button-wa" target="_blank" rel="noopener">CHAT ADMIN VIA WHATSAPP</a>
+        <!-- Join Call-to-Action (Repeat for emphasis) -->
+        <section class="hero" style="margin-top: calc(var(--spacing-unit) * 8);">
+            <a href="/register" class="cta-button" style="padding: calc(var(--spacing-unit) * 4) calc(var(--spacing-unit) * 8); font-size: 1.125rem;">
+                AYO, JADI MITRA TOKO ERA DIGITAL!
+            </a>
         </section>
 
         <footer class="footer">
-            <p>TOKO ERA DIGITAL &copy; 2026. Semua hak dilindungi.</p>
+            <p>TOKO ERA DIGITAL &copy; 2026. Hak cipta dilindungi.</p>
             <p>
                 <a href="#">Kebijakan Privasi</a> |
                 <a href="#">Syarat Layanan</a>
