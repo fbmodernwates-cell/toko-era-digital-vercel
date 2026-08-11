@@ -63,6 +63,10 @@
             alertBox.className = 'alert ' + type + ' show';
         }
 
+        function hideAlert() {
+            alertBox.className = 'alert';
+        }
+
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             hideAlert();
@@ -88,9 +92,9 @@
                 const user = data.user;
                 const role = user.user_metadata?.role;
                 if (role === 'admin') {
-                    window.location.href = '/admin';
+                    window.location.href = '/admin.html';
                 } else {
-                    window.location.href = '/toko';
+                    window.location.href = '/toko.html';
                 }
             } catch (err) {
                 showAlert('Terjadi kesalahan, coba lagi.', 'error');
