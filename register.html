@@ -6,8 +6,6 @@
     <title>Daftar Mitra - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/supabase-config.js"></script>
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -22,9 +20,8 @@
         .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:all .2s}
         .btn:hover{background:var(--primary-dark)}
         .btn:disabled{opacity:.5;cursor:not-allowed}
-        .divider{text-align:center;margin:20px 0;font-size:.85rem;color:var(--text-muted)}
-        .login-link{text-align:center;margin-top:16px;font-size:.85rem;color:var(--text-muted)}
-        .login-link a{color:var(--primary-dark);text-decoration:none;font-weight:600}
+        .links{text-align:center;margin-top:16px;font-size:.85rem;color:var(--text-muted)}
+        .links a{color:var(--primary-dark);text-decoration:none;font-weight:600}
         .back{display:inline-block;margin-bottom:20px;text-decoration:none;color:var(--primary-dark);font-weight:600;font-size:.9rem}
         .alert{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:.88rem;display:none}
         .alert.error{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
@@ -35,6 +32,7 @@
         .step-dot{width:10px;height:10px;border-radius:50%;background:#E5E7EB}
         .step-dot.active{background:var(--primary)}
         .step-dot.done{background:var(--success)}
+        .divider{text-align:center;margin:16px 0;font-size:.85rem;color:var(--text-muted);padding:10px;background:var(--bg);border-radius:8px}
     </style>
 </head>
 <body>
@@ -48,22 +46,22 @@
         </div>
         <div id="alert" class="alert"></div>
 
-        <!-- STEP 1: Kode Unik -->
+        <!-- STEP 1: Kode -->
         <div class="step active" id="step1">
             <div class="form-group">
                 <label for="code">Kode Unik dari Admin</label>
-                <input type="text" id="code" placeholder="Contoh: TED-ABC123" required style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;text-align:center;letter-spacing:2px">
+                <input type="text" id="code" placeholder="TED-XXXXXX" required style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;text-align:center;letter-spacing:2px">
             </div>
             <button class="btn" id="verifyBtn" type="button">Verifikasi Kode</button>
         </div>
 
-        <!-- STEP 2: Formulir Daftar -->
+        <!-- STEP 2: Form -->
         <div class="step" id="step2">
             <div class="divider" id="codeInfo"></div>
             <form id="registerForm">
                 <div class="form-group">
                     <label for="name">Nama Lengkap</label>
-                    <input type="text" id="name" placeholder="Masukkan nama lengkap" required>
+                    <input type="text" id="name" placeholder="Nama lengkap" required>
                 </div>
                 <div class="form-group">
                     <label for="phone">Nomor WhatsApp</label>
@@ -85,20 +83,21 @@
             </form>
         </div>
 
-        <div class="login-link">Sudah punya akun? <a href="/login">Login di sini</a></div>
+        <div class="links">Sudah punya akun? <a href="/login">Login di sini</a></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const SUPABASE_URL = 'https://msqgmtvbxzhsbleraysu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_k3zaTPaPEUr_yLeE-gIJgw_egDCeyFp';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         let verifiedCode = null;
         const alertBox = document.getElementById('alert');
 
         function showAlert(msg, type) {
             alertBox.textContent = msg;
             alertBox.className = 'alert ' + type + ' show';
-        }
-
-        function hideAlert() {
-            alertBox.className = 'alert';
         }
 
         function goToStep(n) {
@@ -110,20 +109,19 @@
 
         // STEP 1: Verify Code
         document.getElementById('verifyBtn').addEventListener('click', async () => {
-            hideAlert();
             const code = document.getElementById('code').value.trim().toUpperCase();
             if (!code) { showAlert('Masukkan kode unik!', 'error'); return; }
 
             const btn = document.getElementById('verifyBtn');
             btn.disabled = true;
-            btn.textContent = 'Memverifikasi...';
+            btn.textContent = 'Verifikasi...';
 
             const { data, error } = await supabase
                 .from('registration_codes')
                 .select('*')
                 .eq('code', code)
                 .eq('is_used', false)
-                .single();
+                .maybeSingle();
 
             if (error || !data) {
                 showAlert('Kode tidak valid atau sudah terpakai!', 'error');
@@ -142,13 +140,13 @@
             verifiedCode = data;
             document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
             goToStep(2);
+            btn.disabled = false;
+            btn.textContent = 'Verifikasi Kode';
         });
 
         // STEP 2: Register
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            hideAlert();
-
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -165,13 +163,14 @@
             btn.textContent = 'Mendaftarkan...';
 
             // 1. Daftar akun
-            const { data: authData, error: authError } = await signUp(email, password, {
-                full_name: name,
-                phone: phone
+            const { data: authData, error: authError } = await supabase.auth.signUp({
+                email: email,
+                password: password,
+                options: { data: { full_name: name, phone: phone } }
             });
 
             if (authError) {
-                showAlert(authError.message, 'error');
+                showAlert('Gagal daftar: ' + authError.message, 'error');
                 btn.disabled = false;
                 btn.textContent = 'Daftar Sekarang';
                 return;
@@ -179,27 +178,19 @@
 
             const userId = authData.user.id;
 
-            // 2. Update kode: tandai terpakai
+            // 2. Tandai kode terpakai
             await supabase.from('registration_codes').update({
                 is_used: true,
                 used_by: userId
             }).eq('id', verifiedCode.id);
 
-            // 3. Buat profil
-            await supabase.from('profiles').upsert({
-                id: userId,
-                email: email,
-                full_name: name,
-                phone: phone
-            });
-
-            // 4. Buat toko
+            // 3. Buat toko
             await supabase.from('stores').insert({
                 user_id: userId,
                 store_name: name + "'s Store"
             });
 
-            showAlert('Pendaftaran berhasil! Mengalihkan ke toko...', 'success');
+            showAlert('Berhasil! Mengalihkan ke toko...', 'success');
             setTimeout(() => { window.location.href = '/toko'; }, 1500);
         });
     </script>
