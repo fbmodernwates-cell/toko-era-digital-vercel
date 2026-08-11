@@ -6,23 +6,81 @@
     <title>Daftar Mitra - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/supabase-config.js"></script>
     <style>
-        :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
-        .register-card{background:var(--bg-card);border-radius:var(--radius);padding:40px 36px;box-shadow:var(--shadow);width:100%;max-width:440px}
-        .register-card h1{font-size:1.6rem;font-weight:800;text-align:center;margin-bottom:8px}
-        .register-card p.sub{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
-        .form-group{margin-bottom:18px}
-        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:var(--text)}
-        .form-group input{width:100%;padding:12px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:.95rem;font-family:inherit;transition:border .2s;background:var(--bg)}
-        .form-group input:focus{outline:none;border-color:var(--primary)}
-        .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;margin-top:8px}
-        .btn:hover{background:var(--primary-dark)}
-        .login-link{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted)}
-        .login-link a{color:var(--primary-dark);text-decoration:none;font-weight:600}
-        .login-link a:hover{text-decoration:underline}
-        .back{display:inline-block;margin-bottom:20px;text-decoration:none;color:var(--primary-dark);font-weight:600;font-size:.9rem}
+        :root {
+            --primary: #D2691E;
+            --primary-dark: #8B4513;
+            --bg: #FDF6EC;
+            --bg-card: #FFFFFF;
+            --text: #1A1A2E;
+            --text-muted: #6B7280;
+            --success: #10B981;
+            --error: #EF4444;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --radius: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+        .register-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 40px 36px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 440px;
+        }
+        .register-card h1 { font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
+        .register-card p.sub { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; color: var(--text); }
+        .form-group input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-family: inherit;
+            transition: border 0.2s;
+            background: var(--bg);
+        }
+        .form-group input:focus { outline: none; border-color: var(--primary); }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+        .login-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
+        .login-link a { color: var(--primary-dark); text-decoration: none; font-weight: 600; }
+        .login-link a:hover { text-decoration: underline; }
+        .back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; }
+        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; display: none; }
+        .alert.error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+        .alert.success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+        .alert.show { display: block; }
     </style>
 </head>
 <body>
@@ -30,6 +88,7 @@
         <a href="/" class="back">&larr; Kembali</a>
         <h1>Daftar Mitra</h1>
         <p class="sub">Bergabung bersama TOKO ERA DIGITAL</p>
+        <div id="alert" class="alert"></div>
         <form id="registerForm">
             <div class="form-group">
                 <label for="name">Nama Lengkap</label>
@@ -47,9 +106,58 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
             </div>
-            <button type="submit" class="btn">Daftar Sekarang</button>
+            <div class="form-group">
+                <label for="confirmPassword">Konfirmasi Password</label>
+                <input type="password" id="confirmPassword" placeholder="Ulangi password" required minlength="8">
+            </div>
+            <button type="submit" class="btn" id="submitBtn">Daftar Sekarang</button>
         </form>
         <div class="login-link">Sudah punya akun? <a href="/login">Login di sini</a></div>
     </div>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = 'alert ' + type + ' show';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                showAlert('Password tidak cocok!', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mendaftarkan...';
+
+            const { data, error } = await signUp(email, password, {
+                full_name: name,
+                phone: phone
+            });
+
+            if (error) {
+                showAlert(error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Daftar Sekarang';
+                return;
+            }
+
+            showAlert('Pendaftaran berhasil! Silakan cek email untuk verifikasi.', 'success');
+            form.reset();
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Daftar Sekarang';
+        });
+    </script>
 </body>
 </html>
