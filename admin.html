@@ -251,7 +251,7 @@
 
         async function init() {
             const user = await getUser();
-            if (!user) { window.location.href = '/login'; return; }
+            if (!user) { window.location.href = '/login.html'; return; }
             adminUser = user;
             document.getElementById('adminName').textContent = user.email;
             document.getElementById('adminEmail').textContent = user.email;
@@ -411,7 +411,7 @@
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await signOut();
-            window.location.href = '/';
+            window.location.href = '/index.html';
         });
 
         init();
