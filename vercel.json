@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/toko", "destination": "/toko.html" },
+    { "source": "/login", "destination": "/login.html" },
+    { "source": "/register", "destination": "/register.html" }
+  ]
+}
