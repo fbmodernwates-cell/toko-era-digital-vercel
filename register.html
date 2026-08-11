@@ -9,124 +9,146 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/js/supabase-config.js"></script>
     <style>
-        :root {
-            --primary: #D2691E;
-            --primary-dark: #8B4513;
-            --bg: #FDF6EC;
-            --bg-card: #FFFFFF;
-            --text: #1A1A2E;
-            --text-muted: #6B7280;
-            --success: #10B981;
-            --error: #EF4444;
-            --shadow: 0 4px 24px rgba(0,0,0,0.06);
-            --radius: 16px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .register-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 40px 36px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 440px;
-        }
-        .register-card h1 { font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
-        .register-card p.sub { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; color: var(--text); }
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #E5E7EB;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border 0.2s;
-            background: var(--bg);
-        }
-        .form-group input:focus { outline: none; border-color: var(--primary); }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: var(--primary);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            margin-top: 8px;
-        }
-        .btn:hover { background: var(--primary-dark); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .login-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-        .login-link a { color: var(--primary-dark); text-decoration: none; font-weight: 600; }
-        .login-link a:hover { text-decoration: underline; }
-        .back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; }
-        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; display: none; }
-        .alert.error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
-        .alert.success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
-        .alert.show { display: block; }
+        :root{--primary:#D2691E;--primary-dark:#8B4513;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:40px 36px;box-shadow:var(--shadow);width:100%;max-width:460px}
+        .card h1{font-size:1.5rem;font-weight:800;text-align:center;margin-bottom:6px}
+        .card p.sub{text-align:center;color:var(--text-muted);font-size:.88rem;margin-bottom:24px}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px}
+        .form-group input{width:100%;padding:12px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:.95rem;font-family:inherit;background:var(--bg);transition:border .2s}
+        .form-group input:focus{outline:none;border-color:var(--primary)}
+        .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:all .2s}
+        .btn:hover{background:var(--primary-dark)}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .divider{text-align:center;margin:20px 0;font-size:.85rem;color:var(--text-muted)}
+        .login-link{text-align:center;margin-top:16px;font-size:.85rem;color:var(--text-muted)}
+        .login-link a{color:var(--primary-dark);text-decoration:none;font-weight:600}
+        .back{display:inline-block;margin-bottom:20px;text-decoration:none;color:var(--primary-dark);font-weight:600;font-size:.9rem}
+        .alert{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:.88rem;display:none}
+        .alert.error{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
+        .alert.success{background:#D1FAE5;color:#065F46;border:1px solid #A7F3D0}
+        .alert.show{display:block}
+        .step{display:none}.step.active{display:block}
+        .step-indicator{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+        .step-dot{width:10px;height:10px;border-radius:50%;background:#E5E7EB}
+        .step-dot.active{background:var(--primary)}
+        .step-dot.done{background:var(--success)}
     </style>
 </head>
 <body>
-    <div class="register-card">
+    <div class="card">
         <a href="/" class="back">&larr; Kembali</a>
         <h1>Daftar Mitra</h1>
         <p class="sub">Bergabung bersama TOKO ERA DIGITAL</p>
+        <div class="step-indicator">
+            <div class="step-dot active" id="dot1"></div>
+            <div class="step-dot" id="dot2"></div>
+        </div>
         <div id="alert" class="alert"></div>
-        <form id="registerForm">
+
+        <!-- STEP 1: Kode Unik -->
+        <div class="step active" id="step1">
             <div class="form-group">
-                <label for="name">Nama Lengkap</label>
-                <input type="text" id="name" placeholder="Masukkan nama lengkap" required>
+                <label for="code">Kode Unik dari Admin</label>
+                <input type="text" id="code" placeholder="Contoh: TED-ABC123" required style="text-transform:uppercase;font-family:monospace;font-size:1.1rem;text-align:center;letter-spacing:2px">
             </div>
-            <div class="form-group">
-                <label for="phone">Nomor WhatsApp</label>
-                <input type="tel" id="phone" placeholder="628xxxxxxxxxx" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" placeholder="email@contoh.com" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Konfirmasi Password</label>
-                <input type="password" id="confirmPassword" placeholder="Ulangi password" required minlength="8">
-            </div>
-            <button type="submit" class="btn" id="submitBtn">Daftar Sekarang</button>
-        </form>
+            <button class="btn" id="verifyBtn" type="button">Verifikasi Kode</button>
+        </div>
+
+        <!-- STEP 2: Formulir Daftar -->
+        <div class="step" id="step2">
+            <div class="divider" id="codeInfo"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="name">Nama Lengkap</label>
+                    <input type="text" id="name" placeholder="Masukkan nama lengkap" required>
+                </div>
+                <div class="form-group">
+                    <label for="phone">Nomor WhatsApp</label>
+                    <input type="tel" id="phone" placeholder="628xxxxxxxxxx" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" placeholder="email@contoh.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Konfirmasi Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Ulangi password" required minlength="8">
+                </div>
+                <button type="submit" class="btn" id="submitBtn">Daftar Sekarang</button>
+            </form>
+        </div>
+
         <div class="login-link">Sudah punya akun? <a href="/login">Login di sini</a></div>
     </div>
 
     <script>
-        const form = document.getElementById('registerForm');
+        let verifiedCode = null;
         const alertBox = document.getElementById('alert');
-        const submitBtn = document.getElementById('submitBtn');
 
-        function showAlert(message, type) {
-            alertBox.textContent = message;
+        function showAlert(msg, type) {
+            alertBox.textContent = msg;
             alertBox.className = 'alert ' + type + ' show';
         }
 
-        form.addEventListener('submit', async (e) => {
+        function hideAlert() {
+            alertBox.className = 'alert';
+        }
+
+        function goToStep(n) {
+            document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+            document.getElementById('step' + n).classList.add('active');
+            document.getElementById('dot1').className = 'step-dot' + (n >= 1 ? ' done' : ' active');
+            document.getElementById('dot2').className = 'step-dot' + (n >= 2 ? ' active' : '');
+        }
+
+        // STEP 1: Verify Code
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+            hideAlert();
+            const code = document.getElementById('code').value.trim().toUpperCase();
+            if (!code) { showAlert('Masukkan kode unik!', 'error'); return; }
+
+            const btn = document.getElementById('verifyBtn');
+            btn.disabled = true;
+            btn.textContent = 'Memverifikasi...';
+
+            const { data, error } = await supabase
+                .from('registration_codes')
+                .select('*')
+                .eq('code', code)
+                .eq('is_used', false)
+                .single();
+
+            if (error || !data) {
+                showAlert('Kode tidak valid atau sudah terpakai!', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Verifikasi Kode';
+                return;
+            }
+
+            if (data.expires_at && new Date(data.expires_at) < new Date()) {
+                showAlert('Kode sudah kedaluwarsa!', 'error');
+                btn.disabled = false;
+                btn.textContent = 'Verifikasi Kode';
+                return;
+            }
+
+            verifiedCode = data;
+            document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
+            goToStep(2);
+        });
+
+        // STEP 2: Register
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideAlert();
+
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -138,25 +160,47 @@
                 return;
             }
 
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Mendaftarkan...';
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Mendaftarkan...';
 
-            const { data, error } = await signUp(email, password, {
+            // 1. Daftar akun
+            const { data: authData, error: authError } = await signUp(email, password, {
                 full_name: name,
                 phone: phone
             });
 
-            if (error) {
-                showAlert(error.message, 'error');
-                submitBtn.disabled = false;
-                submitBtn.textContent = 'Daftar Sekarang';
+            if (authError) {
+                showAlert(authError.message, 'error');
+                btn.disabled = false;
+                btn.textContent = 'Daftar Sekarang';
                 return;
             }
 
-            showAlert('Pendaftaran berhasil! Silakan cek email untuk verifikasi.', 'success');
-            form.reset();
-            submitBtn.disabled = false;
-            submitBtn.textContent = 'Daftar Sekarang';
+            const userId = authData.user.id;
+
+            // 2. Update kode: tandai terpakai
+            await supabase.from('registration_codes').update({
+                is_used: true,
+                used_by: userId
+            }).eq('id', verifiedCode.id);
+
+            // 3. Buat profil
+            await supabase.from('profiles').upsert({
+                id: userId,
+                email: email,
+                full_name: name,
+                phone: phone
+            });
+
+            // 4. Buat toko
+            await supabase.from('stores').insert({
+                user_id: userId,
+                store_name: name + "'s Store"
+            });
+
+            showAlert('Pendaftaran berhasil! Mengalihkan ke toko...', 'success');
+            setTimeout(() => { window.location.href = '/toko'; }, 1500);
         });
     </script>
 </body>
