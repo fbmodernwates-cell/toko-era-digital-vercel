@@ -128,7 +128,13 @@
                 return;
             }
 
-            window.location.href = '/toko';
+            // Cek apakah admin
+            const user = data.user;
+            if (user && user.user_metadata && user.user_metadata.role === 'admin') {
+                window.location.href = '/admin';
+            } else {
+                window.location.href = '/toko';
+            }
         });
     </script>
 </body>
