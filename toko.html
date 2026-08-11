@@ -148,7 +148,7 @@
 
         async function init() {
             const user = await getUser();
-            if (!user) { window.location.href = '/login'; return; }
+            if (!user) { window.location.href = '/login.html'; return; }
             currentUser = user;
             document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
             loadAdminProducts();
@@ -230,7 +230,7 @@
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
             await signOut();
-            window.location.href = '/';
+            window.location.href = '/index.html';
         });
 
         init();
