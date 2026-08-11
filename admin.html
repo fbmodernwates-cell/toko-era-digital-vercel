@@ -7,7 +7,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/supabase-config.js"></script>
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -225,7 +224,20 @@
     </div>
 
     <script>
+        const SUPABASE_URL = 'https://msqgmtvbxzhsbleraysu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_k3zaTPaPEUr_yLeE-gIJgw_egDCeyFp';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         let adminUser = null;
+
+        async function getUser() {
+            const { data: { user } } = await supabase.auth.getUser();
+            return user;
+        }
+
+        async function signOut() {
+            const { error } = await supabase.auth.signOut();
+            return error;
+        }
 
         // TABS
         document.querySelectorAll('.tab').forEach(tab => {
