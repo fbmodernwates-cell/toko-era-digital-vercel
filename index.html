@@ -4,63 +4,228 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TOKO ERA DIGITAL - Toko Online Seumur Hidup</title>
-    <meta name="description" content="Toko online seumur hidup. Dapatkan toko online lengkap bersama TOKO ERA DIGITAL.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-      :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.1);--radius:16px}
-      *{margin:0;padding:0;box-sizing:border-box}
-      body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;-webkit-font-smoothing:antialiased}
-      .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
-      .nav-brand{font-weight:900;font-size:1.2rem;color:var(--primary-dark);text-decoration:none;letter-spacing:-.5px}
-      .nav-links{display:flex;gap:10px}
-      .nav-btn{padding:10px 22px;border-radius:8px;text-decoration:none;font-weight:600;font-size:.9rem;transition:all .2s;border:2px solid var(--primary-dark);color:var(--primary-dark)}
-      .nav-btn:hover{background:var(--primary-dark);color:#fff}
-      .nav-btn.fill{background:var(--primary);border-color:var(--primary);color:#fff}
-      .nav-btn.fill:hover{background:var(--primary-dark);border-color:var(--primary-dark)}
-      .hero{max-width:960px;margin:0 auto;padding:60px 24px 40px;text-align:center}
-      .hero-badge{display:inline-block;background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;padding:6px 18px;border-radius:30px;font-size:.8rem;font-weight:700;margin-bottom:24px}
-      .hero h1{font-size:2.8rem;font-weight:900;line-height:1.15;margin-bottom:20px;letter-spacing:-1px}
-      .hero h1 span{color:var(--primary)}
-      .hero p{font-size:1.15rem;color:var(--text-muted);max-width:600px;margin:0 auto 32px;line-height:1.8}
-      .hero-cta{display:inline-block;background:var(--primary);color:#fff;text-decoration:none;font-size:1.05rem;font-weight:700;padding:16px 40px;border-radius:12px;transition:all .3s;box-shadow:0 6px 20px rgba(210,105,30,.35)}
-      .hero-cta:hover{background:var(--primary-dark);transform:translateY(-2px);box-shadow:0 10px 30px rgba(210,105,30,.4)}
-      .hero-stats{display:flex;justify-content:center;gap:40px;margin-top:40px;flex-wrap:wrap}
-      .hero-stat{text-align:center}
-      .hero-stat strong{display:block;font-size:1.6rem;font-weight:800;color:var(--primary-dark)}
-      .hero-stat span{font-size:.85rem;color:var(--text-muted)}
-      .section{max-width:960px;margin:0 auto;padding:40px 24px}
-      .section-title{text-align:center;font-size:1.6rem;font-weight:800;margin-bottom:8px;letter-spacing:-.5px}
-      .section-sub{text-align:center;color:var(--text-muted);margin-bottom:32px;font-size:.95rem}
-      .card{display:grid;gap:20px;grid-template-columns:repeat(3,1fr)}
-      .card{background:var(--bg-card);border-radius:var(--radius);padding:32px 24px;box-shadow:var(--shadow);text-align:center;transition:all .3s;border:1px solid rgba(0,0,0,.04)}
-      .card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
-      .card-icon{width:56px;height:56px;border-radius:14px;background:linear-gradient(135deg,var(--primary-light),var(--primary));display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:1.5rem}
-      .card h3{font-size:1.05rem;font-weight:700;margin-bottom:8px}
-      .card p{font-size:.9rem;color:var(--text-muted);line-height:1.6}
-      .visi-misi{background:linear-gradient(135deg,var(--primary-dark),var(--primary));border-radius:var(--radius);padding:48px 32px;color:#fff;margin-top:20px}
-      .visi-misi h2{text-align:center;font-size:1.5rem;font-weight:800;margin-bottom:32px}
-      .vm-grid{display:grid;gap:24px;grid-template-columns:1fr 1fr}
-      .vm-box{background:rgba(255,255,255,.12);background-filter:blur(10px);border-radius:12px;padding:28px;border:1px solid rgba(255,255,255,.15)}
-      .vm-box h3{font-size:1rem;font-weight:700;margin-bottom:10px;opacity:.9}
-      .vm-box p{font-size:.92rem;line-height:1.7;opacity:.85}
-      .why-grid{display:grid;gap:20px;grid-template-columns:repeat(2,1fr)}
-      .why-card{background:var(--bg-card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);border-left:4px solid var(--primary)}
-      .why-card h3{font-size:1rem;font-weight:700;margin-bottom:8px}
-      .why-card p{font-size:.9rem;color:var(--text-muted);line-height:1.6}
-      .benefits-box{background:var(--bg-card);border-radius:var(--radius);padding:32px;box-shadow:var(--shadow);margin-top:20px}
-      .benefits-box h2{font-size:1.3rem;font-weight:800;margin-bottom:20px}
-      .benefit-list{list-style:none}
-      .benefit-list li{display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid rgba(0,0,0,.05);font-size:.95rem}
-      .benefit-list li:last-child{border-bottom:none}
-      .benefit-check{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,var(--primary-light),var(--primary));display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:.75rem;font-weight:700;margin-top:2px}
-      .cta-bottom{text-align:center;padding:60px 24px;max-width:960px;margin:0 auto}
-      .cta-bottom h2{font-size:1.8rem;font-weight:900;margin-bottom:16px}
-      .cta-bottom p{color:var(--text-muted);margin-bottom:28px;font-size:1rem}
-      .footer{text-align:center;padding:32px 24px;font-size:.85rem;color:var(--text-muted);border-top:1px solid rgba(0,0,0,.06)}
-      .footer a{color:var(--primary-dari);text-decoration:none}
-      .footer a:hover{text-decoration:underline}
-      @media(max-width:700px){.foot-h1{font-size:2rem}.cards,.vm-grid,.why-grid{grid-template-columns:1fr}.hero-stats{gap:24px}.nav{flex-direction:column;gap:12px}
+        :root {
+            --primary: #D2691E;
+            --primary-dark: #8B4513;
+            --primary-light: #F4A460;
+            --bg: #FDF6EC;
+            --bg-card: #FFFFFF;
+            --text: #1A1A2E;
+            --text-muted: #6B7280;
+            --shadow: 0 4px 24px rgba(0,0,0,0.06);
+            --shadow-lg: 0 12px 40px rgba(0,0,0,0.10);
+            --radius: 16px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+        }
+        .nav {
+            max-width: 960px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 24px;
+        }
+        .nav-brand {
+            font-weight: 900;
+            font-size: 1.2rem;
+            color: var(--primary-dark);
+            text-decoration: none;
+        }
+        .nav-links { display: flex; gap: 10px; }
+        .nav-btn {
+            padding: 10px 22px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            border: 2px solid var(--primary-dark);
+            color: var(--primary-dark);
+        }
+        .nav-btn:hover { background: var(--primary-dark); color: #fff; }
+        .nav-btn.fill { background: var(--primary); border-color: var(--primary); color: #fff; }
+        .nav-btn.fill:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+        .hero {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 60px 24px 40px;
+            text-align: center;
+        }
+        .hero-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: #fff;
+            padding: 6px 18px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        .hero h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.15;
+            margin-bottom: 20px;
+        }
+        .hero h1 span { color: var(--primary); }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto 32px;
+        }
+        .hero-cta {
+            display: inline-block;
+            background: var(--primary);
+            color: #fff;
+            text-decoration: none;
+            font-size: 1.05rem;
+            font-weight: 700;
+            padding: 16px 40px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            box-shadow: 0 6px 20px rgba(210,105,30,0.35);
+        }
+        .hero-cta:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(210,105,30,0.4);
+        }
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 40px;
+            flex-wrap: wrap;
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat strong { display: block; font-size: 1.6rem; font-weight: 800; color: var(--primary-dark); }
+        .hero-stat span { font-size: 0.85rem; color: var(--text-muted); }
+        .section { max-width: 960px; margin: 0 auto; padding: 40px 24px; }
+        .section-title {
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        .section-sub { text-align: center; color: var(--text-muted); margin-bottom: 32px; font-size: 0.95rem; }
+        .cards { display: grid; gap: 20px; grid-template-columns: repeat(3, 1fr); }
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .card-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            font-size: 1.5rem;
+            color: #fff;
+            font-weight: 700;
+        }
+        .card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+        .card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        .visi-misi {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+            border-radius: var(--radius);
+            padding: 48px 32px;
+            color: #fff;
+            margin-top: 20px;
+        }
+        .visi-misi h2 { text-align: center; font-size: 1.5rem; font-weight: 800; margin-bottom: 32px; }
+        .vm-grid { display: grid; gap: 24px; grid-template-columns: 1fr 1fr; }
+        .vm-box {
+            background: rgba(255,255,255,0.12);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 28px;
+            border: 1px solid rgba(255,255,255,0.15);
+        }
+        .vm-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 10px; opacity: 0.9; }
+        .vm-box p { font-size: 0.92rem; line-height: 1.7; opacity: 0.85; }
+        .why-grid { display: grid; gap: 20px; grid-template-columns: repeat(2, 1fr); }
+        .why-card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 28px;
+            box-shadow: var(--shadow);
+            border-left: 4px solid var(--primary);
+        }
+        .why-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+        .why-card p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; }
+        .benefits-box {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 32px;
+            box-shadow: var(--shadow);
+            margin-top: 20px;
+        }
+        .benefits-box h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; }
+        .benefit-list { list-style: none; }
+        .benefit-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+        }
+        .benefit-list li:last-child { border-bottom: none; }
+        .benefit-check {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: #fff;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+        .cta-bottom {
+            text-align: center;
+            padding: 60px 24px;
+            max-width: 960px;
+            margin: 0 auto;
+        }
+        .cta-bottom h2 { font-size: 1.8rem; font-weight: 900; margin-bottom: 16px; }
+        .cta-bottom p { color: var(--text-muted); margin-bottom: 28px; font-size: 1rem; }
+        .footer {
+            text-align: center;
+            padding: 32px 24px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+        .footer a { color: var(--primary-dark); text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+        @media (max-width: 700px) {
+            .hero h1 { font-size: 2rem; }
+            .cards, .vm-grid, .why-grid { grid-template-columns: 1fr; }
+            .hero-stats { gap: 24px; }
+            .nav { flex-direction: column; gap: 12px; }
+        }
     </style>
 </head>
 <body>
@@ -73,104 +238,100 @@
     </nav>
 
     <section class="hero">
-        <div class="hero-badge">UMKM0 GO DIGITAL</div>
+        <div class="hero-badge">UMKM GO DIGITAL</div>
         <h1>Toko Online<br><span>Seumur Hidup</span></h1>
-        <p>Milik toko online lengkap sia pkai. Satu kali daatar, langsung aktif seumur hidup. Lebih cepat, leibhat, leibuangunkan.</p>
+        <p>Miliki toko online lengkap siap pakai. Satu kali daftar, langsung aktif seumur hidup. Lebih cepat, lebih hemat, lebih menguntungkan.</p>
         <a href="/register" class="hero-cta">Daftar Sekarang</a>
         <div class="hero-stats">
             <div class="hero-stat"><strong>2.651+</strong><span>Mitra Aktif</span></div>
-            <div class="hero-stat"><strong>Seumur Hidup</strong><span>Tanka Perpanjian</span></div>
-            <div class="hero-stat"><strong>Full Support</strong><span>Bimbingan Sampi Sukses</span></div>
+            <div class="hero-stat"><strong>Seumur Hidup</strong><span>Tanpa Perpanjangan</span></div>
+            <div class="hero-stat"><strong>Full Support</strong><span>Bimbingan Sampai Sukses</span></div>
         </div>
     </section>
 
     <section class="section">
-        <h2 class="section-title">Kenapa TOKO ERA DIGITAL</h2>
-        <p class="section-sub">Solusi terbaiks untuk UMKM0 yangin go digital</p>
+        <h2 class="section-title">Kenapa TOKO ERA DIGITAL?</h2>
+        <p class="section-sub">Solusi terbaik untuk UMKM yang ingin go digital</p>
         <div class="cards">
             <div class="card">
-                <div class="card-icon">ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¨</div>
-                <h3>Modal Terjangau</h3>
-                <p>Cukup sekali investiasa, toko online Anda aktif selamanya tanpa bio pernama</p>
+                <div class="card-icon">$</div>
+                <h3>Modal Terjangkau</h3>
+                <p>Cukup sekali investasi, toko online Anda aktif selamanya tanpa biaya perpanjangan.</p>
             </div>
             <div class="card">
-                <div class="card-icon">ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬Â¡</div>
+                <div class="card-icon">+</div>
                 <h3>Toko Siap Pakai</h3>
-                <p>Website toko online Anda langsung aktif dan digunan bergjanan dalam hitungan menit</p>
+                <p>Website toko online Anda langsung aktif dan bisa digunakan berjualan dalam hitungan menit.</p>
             </div>
             <div class="card">
-                <div class="card-icon">ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â</div>
+                <div class="card-icon">#</div>
                 <h3>Full Support</h3>
-                <p>Pembimbing kuhus mendamping Anda sampai benraryaban menghasil hasil</p>
+                <p>Pembimbing khusus mendampingi Anda sampai benar-benar menghasilkan.</p>
             </div>
         </div>
     </section>
 
     <section class="section">
         <div class="visi-misi">
-            <h2>Fisi &amp; Misi Kami</h2>
+            <h2>Visi &amp; Misi Kami</h2>
             <div class="vm-grid">
                 <div class="vm-box">
-                    <h3>ÃƒÂ°Ã…Â¸Ã‚ÂÃ¢â‚¬â€ Visi</h3>
-                    <p>Menadberi kekasemian toko online terbesar di Indonesia yang mendayerakan setiap UMKM untuk maju dan melesat di era digital.</p>
+                    <h3>Visi</h3>
+                    <p>Menjadi ekosistem toko online terbesar di Indonesia yang memberdayakan setiap UMKM untuk maju dan melesat di era digital.</p>
                 </div>
                 <div class="vm-box">
-                    <h3>ÃƒÂ°Ã…Â¸Ã…Â½Ã¢â‚¬Å¾ Misi</h3>
-                    <p>Mendiapakan toko online lengkap siap pakai, mendamping setiap mitra sampai mengghasil, menghadirkan produks berkmalitas, dan menbangun eksostem digital yang saling menguntungkan.</p>
+                    <h3>Misi</h3>
+                    <p>Menyediakan toko online lengkap siap pakai, mendampingi setiap mitra sampai menghasilkan, menghadirkan produk berkualitas, dan membangun ekosistem digital yang saling menguntungkan.</p>
                 </div>
             </div>
         </div>
     </section>
 
     <section class="section">
-        <h2 class="section-title">Menagha Memilich kami</h2>
-        <p class="section-sub">Perbedaan yang mengbat untak UMMM membili Toko ERA DIGITAL</p>
+        <h2 class="section-title">Mengapa Memilih Kami?</h2>
+        <p class="section-sub">Perbedaan yang membuat UMKM memilih TOKO ERA DIGITAL</p>
         <div class="why-grid">
             <div class="why-card">
-                <h3>ÃƒÂ°Ã…Â¸Ã¢â‚¬ÂÃ¢â‚¬Âº Berubah Bersama Teknologi</h3>
-                <p>Saatnia beralih dari offline ke digital untuk pertumbehan dan bisnis yang lehib dana besar.</p>
+                <h3>Berubah Bersama Teknologi</h3>
+                <p>Saatnya beralih dari offline ke digital untuk pertumbuhan yang lebih cepat dan bisnis yang lebih besar.</p>
             </div>
             <div class="why-card">
-                <h3>ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã¢â‚¬Ëœ Kecepatan Tumbuh Luar Beara</h3>
-                <p>Dengan teknologi usaia Anda tumbuh lebih lebih,sam lehib, lebih ringkas, dan lebih efisien.</p>
+                <h3>Kecepatan Tumbuh Luar Biasa</h3>
+                <p>Dengan digitalisasi, usaha Anda tumbuh lebih cepat, lebih ringkas, dan lebih efisien.</p>
             </div>
             <div class="why-card">
-                <h3>ÃƒÂ°Ã…Â¸Ã¢â‚¬â„¢Ã‚Â¨ Biaya Sangat Efisien</h3>
-                <p>Toko offline 10-30 juta per taHun vs toko online seumur hidup. Hemat hangga 99% biaya operasi.</p>
+                <h3>Biaya Sangat Efisien</h3>
+                <p>Toko offline 10-30 juta per tahun vs toko online seumur hidup. Hemat hingga 99% biaya operasi.</p>
             </div>
             <div class="why-card">
-                <h3>ÃƒÂ°Ã…Â¸Ã¢â‚¬ËœÃ‚Â Dukungan Sampai Sukses</h3>
-                <p>Kami bimbing A Dengan anda pendidikan dan pendamping anda sampai benraryaban menghasil menghasil.</p>
+                <h3>Dukungan Sampai Sukses</h3>
+                <p>Kami bimbing Anda dengan pendidikan dan pendampingan khusus sampai benar-benar menghasilkan.</p>
             </div>
         </div>
     </section>
 
     <section class="section">
         <div class="benefits-box">
-            <h2>ÃƒÂ¢Ã¢â‚¬Å¾Ã¢â‚¬â€ Kenggungan untuk Mitra</h2>
+            <h2>Keunggulan untuk Mitra</h2>
             <ul class="benefit-list">
-                <li><span class="benefit-check">ÃƒÂ¢Ã¢â‚¬Å¾Ã¢â‚¬â€</span> Toko online langsung actif dalam hitungan menit
-                </li>
-                <li><span class="benefit-check">ÃƒÂ¢Ã¢â‚¬Å¾Ã¢â‚¬â€</span> Transaka terintegratisi: pembayaran, pesanan, dan inventiris otomatis
-                </li>
-                <li><span class="benefit-check">ÃƒÂ¢Ã¢â‚¬Å¾Ã¢â‚¬â€</span> Gabung komunitas UMKM dengan bersama pelatihan esklusive
-                </li>
-                <li><span class="benefit-check">ÃƒÂ¢Ã¢â‚¬Å¾Ã¢â‚¬â€</span> Dangkan bantuan teknis tim ahhli dan strategi pemasaran untuk naikan omzet
-                </li>
+                <li><span class="benefit-check">v</span> Toko online langsung aktif dalam hitungan menit</li>
+                <li><span class="benefit-check">v</span> Transaksi terintegrasi: pembayaran, pesanan, dan inventaris otomatis</li>
+                <li><span class="benefit-check">v</span> Gabung komunitas UMKM dengan akses pelatihan eksklusif</li>
+                <li><span class="benefit-check">v</span> Dapatkan bantuan teknis tim ahli serta strategi pemasaran untuk naikkan omzet</li>
             </ul>
         </div>
     </section>
 
     <section class="cta-bottom">
-        <h2>AYO JADM MITRA TOKE ERA DIGITAL</h2>
-        <p>Bergabing dan kanta Toko ERA DIGITAL</p>
+        <h2>AYO JADI MITRA TOKO ERA DIGITAL!</h2>
+        <p>Bergabung dan kembangkan bisnis Anda bersama TOKO ERA DIGITAL</p>
         <a href="/register" class="hero-cta">Daftar Sekarang</a>
     </section>
 
     <footer class="footer">
-        <p>TOKO ERA DIGITAL Ãƒâ€šÃ‚Â© 2026. Hak cipta dilindung.</p>
+        <p>TOKO ERA DIGITAL &copy; 2026. Hak cipta dilindungi.</p>
         <p>
-            <a href="#">Kebajakan Privasi</a>|
+            <a href="#">Kebijakan Privasi</a> |
             <a href="#">Syarat Layanan</a>
         </p>
     </footer>
