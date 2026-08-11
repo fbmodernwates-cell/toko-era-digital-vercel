@@ -6,6 +6,8 @@
     <title>Login - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/js/supabase-config.js"></script>
     <style>
         :root {
             --primary: #D2691E;
@@ -14,6 +16,7 @@
             --bg-card: #FFFFFF;
             --text: #1A1A2E;
             --text-muted: #6B7280;
+            --error: #EF4444;
             --shadow: 0 4px 24px rgba(0,0,0,0.06);
             --radius: 16px;
         }
@@ -68,10 +71,14 @@
             margin-top: 8px;
         }
         .btn:hover { background: var(--primary-dark); }
+        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
         .register-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
         .register-link a { color: var(--primary-dark); text-decoration: none; font-weight: 600; }
         .register-link a:hover { text-decoration: underline; }
         .back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; }
+        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; display: none; }
+        .alert.error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
+        .alert.show { display: block; }
     </style>
 </head>
 <body>
@@ -79,6 +86,7 @@
         <a href="/" class="back">&larr; Kembali</a>
         <h1>Login</h1>
         <p class="sub">Masuk ke akun TOKO ERA DIGITAL Anda</p>
+        <div id="alert" class="alert"></div>
         <form id="loginForm">
             <div class="form-group">
                 <label for="email">Email</label>
@@ -88,9 +96,40 @@
                 <label for="password">Password</label>
                 <input type="password" id="password" placeholder="Masukkan password" required>
             </div>
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn" id="submitBtn">Login</button>
         </form>
         <div class="register-link">Belum punya akun? <a href="/register">Daftar di sini</a></div>
     </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function showAlert(message, type) {
+            alertBox.textContent = message;
+            alertBox.className = 'alert ' + type + ' show';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Masuk...';
+
+            const { data, error } = await signIn(email, password);
+
+            if (error) {
+                showAlert(error.message, 'error');
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+                return;
+            }
+
+            window.location.href = '/toko';
+        });
+    </script>
 </body>
 </html>
