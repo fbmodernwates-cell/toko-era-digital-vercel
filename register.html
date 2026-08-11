@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Mitra - TOKO ERA DIGITAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+        .register-card{background:var(--bg-card);border-radius:var(--radius);padding:40px 36px;box-shadow:var(--shadow);width:100%;max-width:440px}
+        .register-card h1{font-size:1.6rem;font-weight:800;text-align:center;margin-bottom:8px}
+        .register-card p.sub{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
+        .form-group{margin-bottom:18px}
+        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px;color:var(--text)}
+        .form-group input{width:100%;padding:12px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:.95rem;font-family:inherit;transition:border .2s;background:var(--bg)}
+        .form-group input:focus{outline:none;border-color:var(--primary)}
+        .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;transition:all .2s;font-family:inherit;margin-top:8px}
+        .btn:hover{background:var(--primary-dark)}
+        .login-link{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted)}
+        .login-link a{color:var(--primary-dark);text-decoration:none;font-weight:600}
+        .login-link a:hover{text-decoration:underline}
+        .back{display:inline-block;margin-bottom:20px;text-decoration:none;color:var(--primary-dark);font-weight:600;font-size:.9rem}
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <a href="/" class="back">&larr; Kembali</a>
+        <h1>Daftar Mitra</h1>
+        <p class="sub">Bergabung bersama TOKO ERA DIGITAL</p>
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="name">Nama Lengkap</label>
+                <input type="text" id="name" placeholder="Masukkan nama lengkap" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Nomor WhatsApp</label>
+                <input type="tel" id="phone" placeholder="628xxxxxxxxxx" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" id="email" placeholder="email@contoh.com" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" placeholder="Minimal 8 karakter" required minlength="8">
+            </div>
+            <button type="submit" class="btn">Daftar Sekarang</button>
+        </form>
+        <div class="login-link">Sudah punya akun? <a href="/login">Login di sini</a></div>
+    </div>
+</body>
+</html>
