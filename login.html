@@ -6,86 +6,33 @@
     <title>Login - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/js/supabase-config.js"></script>
     <style>
-        :root {
-            --primary: #D2691E;
-            --primary-dark: #8B4513;
-            --bg: #FDF6EC;
-            --bg-card: #FFFFFF;
-            --text: #1A1A2E;
-            --text-muted: #6B7280;
-            --error: #EF4444;
-            --shadow: 0 4px 24px rgba(0,0,0,0.06);
-            --radius: 16px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .login-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 40px 36px;
-            box-shadow: var(--shadow);
-            width: 100%;
-            max-width: 440px;
-        }
-        .login-card h1 { font-size: 1.6rem; font-weight: 800; text-align: center; margin-bottom: 8px; }
-        .login-card p.sub { text-align: center; color: var(--text-muted); font-size: 0.9rem; margin-bottom: 28px; }
-        .form-group { margin-bottom: 18px; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; color: var(--text); }
-        .form-group input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #E5E7EB;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border 0.2s;
-            background: var(--bg);
-        }
-        .form-group input:focus { outline: none; border-color: var(--primary); }
-        .btn {
-            width: 100%;
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            background: var(--primary);
-            color: #fff;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-            margin-top: 8px;
-        }
-        .btn:hover { background: var(--primary-dark); }
-        .btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .register-link { text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); }
-        .register-link a { color: var(--primary-dark); text-decoration: none; font-weight: 600; }
-        .register-link a:hover { text-decoration: underline; }
-        .back { display: inline-block; margin-bottom: 20px; text-decoration: none; color: var(--primary-dark); font-weight: 600; font-size: 0.9rem; }
-        .alert { padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; font-size: 0.9rem; display: none; }
-        .alert.error { background: #FEE2E2; color: #DC2626; border: 1px solid #FECACA; }
-        .alert.show { display: block; }
+        :root{--primary:#D2691E;--primary-dark:#8B4513;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:40px 36px;box-shadow:var(--shadow);width:100%;max-width:440px}
+        .card h1{font-size:1.6rem;font-weight:800;text-align:center;margin-bottom:8px}
+        .card p.sub{text-align:center;color:var(--text-muted);font-size:.9rem;margin-bottom:28px}
+        .form-group{margin-bottom:18px}
+        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px}
+        .form-group input{width:100%;padding:12px 14px;border:2px solid #E5E7EB;border-radius:10px;font-size:.95rem;font-family:inherit;background:var(--bg);transition:border .2s}
+        .form-group input:focus{outline:none;border-color:var(--primary)}
+        .btn{width:100%;padding:14px;border:none;border-radius:10px;background:var(--primary);color:#fff;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;margin-top:8px;transition:all .2s}
+        .btn:hover{background:var(--primary-dark)}
+        .btn:disabled{opacity:.5;cursor:not-allowed}
+        .links{text-align:center;margin-top:20px;font-size:.85rem;color:var(--text-muted)}
+        .links a{color:var(--primary-dark);text-decoration:none;font-weight:600}
+        .back{display:inline-block;margin-bottom:20px;text-decoration:none;color:var(--primary-dark);font-weight:600;font-size:.9rem}
+        .alert{padding:12px 16px;border-radius:10px;margin-bottom:16px;font-size:.88rem;display:none}
+        .alert.error{background:#FEE2E2;color:#DC2626;border:1px solid #FECACA}
+        .alert.show{display:block}
     </style>
 </head>
 <body>
-    <div class="login-card">
+    <div class="card">
         <a href="/" class="back">&larr; Kembali</a>
         <h1>Login</h1>
-        <p class="sub">Masuk ke akun TOKO ERA DIGITAL Anda</p>
+        <p class="sub">Masuk ke akun TOKO ERA DIGITAL</p>
         <div id="alert" class="alert"></div>
         <form id="loginForm">
             <div class="form-group">
@@ -98,42 +45,57 @@
             </div>
             <button type="submit" class="btn" id="submitBtn">Login</button>
         </form>
-        <div class="register-link">Belum punya akun? <a href="/register">Daftar di sini</a></div>
+        <div class="links">Belum punya akun? <a href="/register">Daftar di sini</a></div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const SUPABASE_URL = 'https://msqgmtvbxzhsbleraysu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_k3zaTPaPEUr_yLeE-gIJgw_egDCeyFp';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
         const form = document.getElementById('loginForm');
         const alertBox = document.getElementById('alert');
         const submitBtn = document.getElementById('submitBtn');
 
-        function showAlert(message, type) {
-            alertBox.textContent = message;
+        function showAlert(msg, type) {
+            alertBox.textContent = msg;
             alertBox.className = 'alert ' + type + ' show';
         }
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
+            hideAlert();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
             submitBtn.disabled = true;
             submitBtn.textContent = 'Masuk...';
 
-            const { data, error } = await signIn(email, password);
+            try {
+                const { data, error } = await supabase.auth.signInWithPassword({
+                    email: email,
+                    password: password
+                });
 
-            if (error) {
-                showAlert(error.message, 'error');
+                if (error) {
+                    showAlert('Email atau password salah!', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                    return;
+                }
+
+                const user = data.user;
+                const role = user.user_metadata?.role;
+                if (role === 'admin') {
+                    window.location.href = '/admin';
+                } else {
+                    window.location.href = '/toko';
+                }
+            } catch (err) {
+                showAlert('Terjadi kesalahan, coba lagi.', 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
-                return;
-            }
-
-            // Cek apakah admin
-            const user = data.user;
-            if (user && user.user_metadata && user.user_metadata.role === 'admin') {
-                window.location.href = '/admin';
-            } else {
-                window.location.href = '/toko';
             }
         });
     </script>
