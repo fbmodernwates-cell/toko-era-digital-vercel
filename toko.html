@@ -9,235 +9,60 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/js/supabase-config.js"></script>
     <style>
-        :root {
-            --primary: #D2691E;
-            --primary-dark: #8B4513;
-            --primary-light: #F4A460;
-            --bg: #FDF6EC;
-            --bg-card: #FFFFFF;
-            --text: #1A1A2E;
-            --text-muted: #6B7280;
-            --success: #10B981;
-            --shadow: 0 4px 24px rgba(0,0,0,0.06);
-            --shadow-lg: 0 12px 40px rgba(0,0,0,0.10);
-            --radius: 16px;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            min-height: 100vh;
-        }
+        :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.10);--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+        .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
+        .nav-brand{font-weight:900;font-size:1.2rem;color:var(--primary-dark);text-decoration:none}
+        .nav-right{display:flex;align-items:center;gap:16px}
+        .nav-user{font-size:.9rem;color:var(--text-muted)}
+        .nav-user strong{color:var(--text)}
+        .btn-logout{padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;border:2px solid var(--error);color:var(--error);background:transparent;cursor:pointer;font-family:inherit;transition:all .2s}
+        .btn-logout:hover{background:var(--error);color:#fff}
 
-        /* NAV */
-        .nav {
-            max-width: 960px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 20px 24px;
-        }
-        .nav-brand {
-            font-weight: 900;
-            font-size: 1.2rem;
-            color: var(--primary-dark);
-            text-decoration: none;
-        }
-        .nav-right { display: flex; align-items: center; gap: 16px; }
-        .nav-user { font-size: 0.9rem; color: var(--text-muted); }
-        .nav-user strong { color: var(--text); }
-        .btn-logout {
-            padding: 8px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.85rem;
-            border: 2px solid var(--error);
-            color: var(--error);
-            background: transparent;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-logout:hover { background: var(--error); color: #fff; }
-
-        /* DASHBOARD */
-        .dashboard {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 20px 24px 60px;
-        }
-        .dashboard-header {
-            margin-bottom: 32px;
-        }
-        .dashboard-header h1 {
-            font-size: 1.8rem;
-            font-weight: 800;
-            margin-bottom: 4px;
-        }
-        .dashboard-header p {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
+        .container{max-width:960px;margin:0 auto;padding:20px 24px 60px}
+        .header{margin-bottom:28px}
+        .header h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
+        .header p{color:var(--text-muted);font-size:.92rem}
 
         /* STATS */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        .stat-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 24px;
-            box-shadow: var(--shadow);
-            text-align: center;
-        }
-        .stat-card .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary-light), var(--primary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 12px;
-            color: #fff;
-            font-size: 1.2rem;
-            font-weight: 700;
-        }
-        .stat-card h3 { font-size: 1.5rem; font-weight: 800; color: var(--primary-dark); }
-        .stat-card p { font-size: 0.8rem; color: var(--text-muted); margin-top: 4px; }
+        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
+        .stat{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-align:center}
+        .stat h3{font-size:1.4rem;font-weight:800;color:var(--primary-dark)}
+        .stat p{font-size:.8rem;color:var(--text-muted);margin-top:2px}
 
-        /* MENU */
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 32px;
-        }
-        .menu-card {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 28px 24px;
-            box-shadow: var(--shadow);
-            text-decoration: none;
-            color: var(--text);
-            transition: all 0.3s;
-            border-left: 4px solid var(--primary);
-        }
-        .menu-card:hover {
-            transform: translateY(-4px);
-            box-shadow: var(--shadow-lg);
-        }
-        .menu-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 6px; }
-        .menu-card p { font-size: 0.85rem; color: var(--text-muted); line-height: 1.5; }
-
-        /* PRODUCTS TABLE */
-        .products-section {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 28px;
-            box-shadow: var(--shadow);
-            margin-bottom: 32px;
-        }
-        .products-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .products-header h2 { font-size: 1.2rem; font-weight: 800; }
-        .btn-add {
-            padding: 10px 20px;
-            border-radius: 8px;
-            border: none;
-            background: var(--primary);
-            color: #fff;
-            font-weight: 600;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .btn-add:hover { background: var(--primary-dark); }
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: var(--text-muted);
-        }
-        .empty-state p { margin-bottom: 16px; }
+        /* GRID PRODUK */
+        .section-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+        .btn-add{padding:8px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit}
+        .btn-add:hover{background:var(--primary-dark)}
+        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+        .product-card{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);transition:all .3s}
+        .product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
+        .product-card .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-bottom:8px}
+        .badge-admin{background:#DBEAFE;color:#1E40AF}
+        .badge-user{background:#D1FAE5;color:#065F46}
+        .product-card h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
+        .product-card .price{font-size:1rem;font-weight:800;color:var(--primary-dark);margin-bottom:4px}
+        .product-card .stock{font-size:.8rem;color:var(--text-muted)}
+        .product-card .desc{font-size:.82rem;color:var(--text-muted);margin-top:6px;line-height:1.5}
+        .empty{text-align:center;padding:32px;color:var(--text-muted);font-size:.9rem}
 
         /* MODAL */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-        }
-        .modal-overlay.active { display: flex; }
-        .modal {
-            background: var(--bg-card);
-            border-radius: var(--radius);
-            padding: 32px;
-            width: 100%;
-            max-width: 480px;
-            box-shadow: var(--shadow-lg);
-        }
-        .modal h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 20px; }
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-weight: 600; font-size: 0.85rem; margin-bottom: 6px; }
-        .form-group input, .form-group textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 2px solid #E5E7EB;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: border 0.2s;
-            background: var(--bg);
-        }
-        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--primary); }
-        .form-group textarea { resize: vertical; min-height: 80px; }
-        .modal-actions { display: flex; gap: 12px; margin-top: 20px; }
-        .modal-actions button {
-            flex: 1;
-            padding: 12px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        .btn-cancel {
-            background: #E5E7EB;
-            border: none;
-            color: var(--text);
-        }
-        .btn-cancel:hover { background: #D1D5DB; }
-        .btn-save {
-            background: var(--primary);
-            border: none;
-            color: #fff;
-        }
-        .btn-save:hover { background: var(--primary-dark); }
+        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:24px}
+        .modal-overlay.active{display:flex}
+        .modal{background:var(--bg-card);border-radius:var(--radius);padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-lg)}
+        .modal h2{font-size:1.2rem;font-weight:800;margin-bottom:16px}
+        .form-group{margin-bottom:14px}
+        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px}
+        .form-group input,.form-group textarea{width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:8px;font-size:.9rem;font-family:inherit;background:var(--bg)}
+        .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--primary)}
+        .form-group textarea{resize:vertical;min-height:60px}
+        .modal-actions{display:flex;gap:10px;margin-top:16px}
+        .modal-actions button{flex:1;padding:10px;border-radius:8px;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit}
+        .btn-cancel{background:#E5E7EB;border:none;color:var(--text)}
+        .btn-save{background:var(--primary);border:none;color:#fff}
 
-        @media (max-width: 700px) {
-            .stats { grid-template-columns: 1fr; }
-            .menu-grid { grid-template-columns: 1fr; }
-        }
+        @media(max-width:600px){.stats{grid-template-columns:1fr}.product-grid{grid-template-columns:1fr}}
     </style>
 </head>
 <body>
@@ -249,86 +74,58 @@
         </div>
     </nav>
 
-    <div class="dashboard">
-        <div class="dashboard-header">
+    <div class="container">
+        <div class="header">
             <h1>Dashboard Toko</h1>
-            <p>Kelola toko online Anda di sini</p>
+            <p>Kelola toko online Anda</p>
         </div>
 
         <div class="stats">
-            <div class="stat-card">
-                <div class="stat-icon">P</div>
-                <h3 id="totalProducts">0</h3>
-                <p>Produk</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">O</div>
-                <h3 id="totalOrders">0</h3>
-                <p>Pesanan</p>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">R</div>
-                <h3 id="totalRevenue">Rp 0</h3>
-                <p>Pendapatan</p>
-            </div>
+            <div class="stat"><h3 id="totalAdmin">0</h3><p>Produk Etalase</p></div>
+            <div class="stat"><h3 id="totalUser">0</h3><p>Produk Saya</p></div>
+            <div class="stat"><h3 id="totalAll">0</h3><p>Total Produk Toko</p></div>
         </div>
 
-        <div class="menu-grid">
-            <a href="#" class="menu-card" id="menuProducts">
-                <h3>Produk</h3>
-                <p>Tambah, edit, dan kelola produk toko Anda</p>
-            </a>
-            <a href="#" class="menu-card" id="menuOrders">
-                <h3>Pesanan</h3>
-                <p>Lihat dan kelola pesanan dari pelanggan</p>
-            </a>
-            <a href="#" class="menu-card" id="menuStore">
-                <h3>Pengaturan Toko</h3>
-                <p>Ubah nama, deskripsi, dan pengaturan toko</p>
-            </a>
-            <a href="#" class="menu-card" id="menuProfile">
-                <h3>Profil Saya</h3>
-                <p>Ubah informasi akun dan password</p>
-            </a>
+        <!-- PRODUK ETALASE (dari Admin) -->
+        <div class="section-title">Produk Etalase</div>
+        <div id="adminProducts" class="product-grid">
+            <div class="empty">Memuat produk...</div>
         </div>
 
-        <div class="products-section">
-            <div class="products-header">
-                <h2>Produk Terbaru</h2>
-                <button class="btn-add" id="addProductBtn">+ Tambah Produk</button>
-            </div>
-            <div id="productsList">
-                <div class="empty-state">
-                    <p>Belum ada produk. Mulai tambahkan produk pertama Anda!</p>
-                </div>
-            </div>
+        <!-- PRODUK SENDIRI -->
+        <div class="section-title">
+            Produk Saya
+            <button class="btn-add" id="addMyProductBtn">+ Tambah Produk</button>
+        </div>
+        <div id="userProducts" class="product-grid">
+            <div class="empty">Belum ada produk. Klik "Tambah Produk" untuk mulai!</div>
         </div>
     </div>
 
-    <!-- Modal Tambah Produk -->
+    <!-- MODAL TAMBAH PRODUK -->
     <div class="modal-overlay" id="productModal">
         <div class="modal">
-            <h2>Tambah Produk</h2>
+            <h2>Tambah Produk Saya</h2>
             <form id="productForm">
                 <div class="form-group">
-                    <label for="productName">Nama Produk</label>
-                    <input type="text" id="productName" placeholder="Contoh: Kaos Distro" required>
+                    <label>Nama Produk</label>
+                    <input type="text" id="pName" placeholder="Contoh: Kaos Distro" required>
                 </div>
                 <div class="form-group">
-                    <label for="productPrice">Harga (Rp)</label>
-                    <input type="number" id="productPrice" placeholder="Contoh: 150000" required>
+                    <label>Harga (Rp)</label>
+                    <input type="number" id="pPrice" placeholder="150000" required>
                 </div>
                 <div class="form-group">
-                    <label for="productDesc">Deskripsi</label>
-                    <textarea id="productDesc" placeholder="Deskripsi produk..."></textarea>
+                    <label>Stok</label>
+                    <input type="number" id="pStock" placeholder="50" required>
                 </div>
                 <div class="form-group">
-                    <label for="productStock">Stok</label>
-                    <input type="number" id="productStock" placeholder="Contoh: 50" required>
+                    <label>Deskripsi</label>
+                    <textarea id="pDesc" placeholder="Deskripsi produk..."></textarea>
                 </div>
                 <div class="modal-actions">
                     <button type="button" class="btn-cancel" id="cancelBtn">Batal</button>
-                    <button type="submit" class="btn-save">Simpan Produk</button>
+                    <button type="submit" class="btn-save">Simpan</button>
                 </div>
             </form>
         </div>
@@ -339,80 +136,84 @@
 
         async function init() {
             const user = await getUser();
-            if (!user) {
-                window.location.href = '/login';
-                return;
-            }
+            if (!user) { window.location.href = '/login'; return; }
             currentUser = user;
             document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
-            loadProducts();
+            loadAdminProducts();
+            loadUserProducts();
         }
 
-        async function loadProducts() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq('user_id', currentUser.id)
-                .order('created_at', { ascending: false });
-
-            if (error) {
-                console.error('Error loading products:', error);
+        // PRODUK ETALASE (Admin)
+        async function loadAdminProducts() {
+            const { data } = await supabase.from('admin_products').select('*').eq('is_active', true).order('created_at', { ascending: false });
+            const container = document.getElementById('adminProducts');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty">Belum ada produk etalase</div>';
+                document.getElementById('totalAdmin').textContent = '0';
+                updateTotal();
                 return;
             }
-
-            document.getElementById('totalProducts').textContent = data.length;
-
-            if (data.length === 0) {
-                document.getElementById('productsList').innerHTML = '<div class="empty-state"><p>Belum ada produk. Mulai tambahkan produk pertama Anda!</p></div>';
-                return;
-            }
-
-            let html = '<table style="width:100%;border-collapse:collapse;">';
-            html += '<tr style="border-bottom:2px solid #E5E7EB;text-align:left;"><th style="padding:12px 8px;font-size:0.85rem;color:#6B7280;">Nama</th><th style="padding:12px 8px;font-size:0.85rem;color:#6B7280;">Harga</th><th style="padding:12px 8px;font-size:0.85rem;color:#6B7280;">Stok</th><th style="padding:12px 8px;font-size:0.85rem;color:#6B7280;">Aksi</th></tr>';
+            document.getElementById('totalAdmin').textContent = data.length;
+            let html = '';
             data.forEach(p => {
-                html += '<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px 8px;">' + p.name + '</td><td style="padding:12px 8px;">Rp ' + Number(p.price).toLocaleString('id') + '</td><td style="padding:12px 8px;">' + p.stock + '</td><td style="padding:12px 8px;"><button onclick="deleteProduct(\'' + p.id + '\')" style="background:none;border:none;color:#EF4444;cursor:pointer;font-weight:600;">Hapus</button></td></tr>';
+                html += '<div class="product-card"><span class="badge badge-admin">Etalase</span><h3>' + p.name + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + p.description + '</div>' : '') + '</div>';
             });
-            html += '</table>';
-            document.getElementById('productsList').innerHTML = html;
+            container.innerHTML = html;
+            updateTotal();
         }
 
-        async function deleteProduct(id) {
-            if (!confirm('Yakin ingin hapus produk ini?')) return;
-            const { error } = await supabase.from('products').delete().eq('id', id);
-            if (!error) loadProducts();
+        // PRODUK SENDIRI (User)
+        async function loadUserProducts() {
+            const { data } = await supabase.from('user_products').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+            const container = document.getElementById('userProducts');
+            if (!data || data.length === 0) {
+                container.innerHTML = '<div class="empty">Belum ada produk. Klik "Tambah Produk" untuk mulai!</div>';
+                document.getElementById('totalUser').textContent = '0';
+                updateTotal();
+                return;
+            }
+            document.getElementById('totalUser').textContent = data.length;
+            let html = '';
+            data.forEach(p => {
+                html += '<div class="product-card"><span class="badge badge-user">Produk Saya</span><h3>' + p.name + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + p.description + '</div>' : '') + '<div style="margin-top:10px"><button onclick="deleteMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--error);cursor:pointer;font-weight:600;font-size:.8rem">Hapus</button></div></div>';
+            });
+            container.innerHTML = html;
+            updateTotal();
         }
 
-        document.getElementById('addProductBtn').addEventListener('click', () => {
+        function updateTotal() {
+            const a = parseInt(document.getElementById('totalAdmin').textContent) || 0;
+            const u = parseInt(document.getElementById('totalUser').textContent) || 0;
+            document.getElementById('totalAll').textContent = a + u;
+        }
+
+        async function deleteMyProduct(id) {
+            if (!confirm('Hapus produk ini?')) return;
+            await supabase.from('user_products').delete().eq('id', id);
+            loadUserProducts();
+        }
+
+        // MODAL
+        document.getElementById('addMyProductBtn').addEventListener('click', () => {
             document.getElementById('productModal').classList.add('active');
         });
-
         document.getElementById('cancelBtn').addEventListener('click', () => {
             document.getElementById('productModal').classList.remove('active');
         });
 
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const name = document.getElementById('productName').value.trim();
-            const price = document.getElementById('productPrice').value;
-            const description = document.getElementById('productDesc').value.trim();
-            const stock = document.getElementById('productStock').value;
-
-            const { error } = await supabase.from('products').insert({
+            const { error } = await supabase.from('user_products').insert({
                 user_id: currentUser.id,
-                name,
-                price,
-                description,
-                stock
+                name: document.getElementById('pName').value.trim(),
+                price: document.getElementById('pPrice').value,
+                stock: document.getElementById('pStock').value,
+                description: document.getElementById('pDesc').value.trim()
             });
-
-            if (error) {
-                alert('Gagal menyimpan produk: ' + error.message);
-                return;
-            }
-
+            if (error) { alert('Gagal: ' + error.message); return; }
             document.getElementById('productModal').classList.remove('active');
-            document.getElementById('productForm').reset();
-            loadProducts();
+            e.target.reset();
+            loadUserProducts();
         });
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
