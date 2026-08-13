@@ -86,10 +86,16 @@
         <div class="links">Sudah punya akun? <a href="/login">Login di sini</a></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script>
-        
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+            document.getElementById('alert').textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
+            document.getElementById('alert').className = 'alert error show';
+            const btn = document.getElementById('submitBtn');
+            if (btn) { btn.disabled = true; btn.textContent = 'Muat ulang halaman'; }
+        }
         let verifiedCode = null;
         let isAdminRegister = false;
         const alertBox = document.getElementById('alert');
@@ -179,65 +185,81 @@
             btn.disabled = true;
             btn.textContent = 'Mendaftarkan...';
 
-            // 1. Daftar akun
-            const metadata = { full_name: name, phone: phone };
-            if (isAdminRegister) metadata.role = 'admin';
-
-            const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: email,
-                password: password,
-                options: { data: metadata, email_confirm: false }
-            });
-
-            if (authError) {
-                showAlert('Gagal daftar: ' + authError.message, 'error');
-                btn.disabled = false;
-                btn.textContent = 'Daftar Sekarang';
-                return;
-            }
-
-            const userId = authData.user.id;
-
-            // 2. Tandai kode terpakai
-            await supabase.from('registration_codes').update({
-                is_used: true,
-                used_by: userId
-            }).eq('id', verifiedCode.id);
-
-            // 3. Buat toko
-            await supabase.from('stores').insert({
-                user_id: userId,
-                store_name: name + "'s Store"
-            });
-
-            // 4. Jika register admin, pastikan role admin tersimpan di profile
-            if (isAdminRegister) {
-                await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
-            }
-
-            showAlert('Berhasil! Mengalihkan...', 'success');
-
-            // Login otomatis setelah daftar untuk memastikan session aktif
             try {
-                const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-                    email,
-                    password
+                // 1. Daftar akun
+                const metadata = { full_name: name, phone: phone };
+                if (isAdminRegister) metadata.role = 'admin';
+
+                const { data: authData, error: authError } = await supabase.auth.signUp({
+                    email: email,
+                    password: password,
+                    options: { data: metadata, email_confirm: false }
                 });
-                if (loginError || !loginData.user) {
-                    setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+
+                if (authError) {
+                    const msg = authError.message || '';
+                    let message = 'Gagal daftar: ' + msg;
+                    if (msg.includes('over_email_send_rate_limit')) {
+                        message = 'Terlalu banyak percobaan daftar. Tunggu beberapa saat.';
+                    } else if (msg.includes('email_address_invalid')) {
+                        message = 'Format email tidak valid. Coba email lain.';
+                    } else if (msg.includes('User already registered')) {
+                        message = 'Email ini sudah terdaftar. Coba login.';
+                    }
+                    showAlert(message, 'error');
+                    btn.disabled = false;
+                    btn.textContent = 'Daftar Sekarang';
                     return;
                 }
-                const userId = loginData.user.id;
+
+                const userId = authData.user.id;
+
+                // 2. Tandai kode terpakai
+                await supabase.from('registration_codes').update({
+                    is_used: true,
+                    used_by: userId
+                }).eq('id', verifiedCode.id);
+
+                // 3. Buat toko
+                await supabase.from('stores').insert({
+                    user_id: userId,
+                    store_name: name + "'s Store"
+                });
+
+                // 4. Jika register admin, pastikan role admin tersimpan di profile
                 if (isAdminRegister) {
                     await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
                 }
-                const role = loginData.user.user_metadata?.role;
-                setTimeout(() => {
-                    window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
-                }, 1000);
-            } catch (e) {
-                console.error('Auto-login failed', e);
-                setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+
+                showAlert('Berhasil! Mengalihkan...', 'success');
+
+                // Login otomatis setelah daftar untuk memastikan session aktif
+                try {
+                    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                        email,
+                        password
+                    });
+                    if (loginError || !loginData.user) {
+                        setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+                        return;
+                    }
+                    const userId = loginData.user.id;
+                    if (isAdminRegister) {
+                        await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
+                    }
+                    const role = loginData.user.user_metadata?.role;
+                    setTimeout(() => {
+                        window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
+                    }, 1000);
+                } catch (e) {
+                    console.error('Auto-login failed', e);
+                    setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+                }
+            } catch (err) {
+                console.error('Register submit error', err);
+                showAlert('Terjadi kesalahan: ' + (err.message || err), 'error');
+                btn.disabled = false;
+                btn.textContent = 'Daftar Sekarang';
             }
         });
     </script>
