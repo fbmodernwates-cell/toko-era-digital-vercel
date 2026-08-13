@@ -48,9 +48,14 @@
         <div class="links">Belum punya akun? <a href="/register">Daftar di sini</a></div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script>
+        if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+            document.getElementById('alert').textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
+            document.getElementById('alert').className = 'alert error show';
+            document.getElementById('submitBtn').disabled = true;
+        }
         
         const form = document.getElementById('loginForm');
         const alertBox = document.getElementById('alert');
@@ -88,6 +93,13 @@
                 }
 
                 const user = data.user;
+                if (!user) {
+                    showAlert('Gagal mendapatkan data pengguna.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                    return;
+                }
+
                 let profile = null;
                 try {
                     const res = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
