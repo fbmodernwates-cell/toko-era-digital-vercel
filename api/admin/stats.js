@@ -1,26 +1,19 @@
 // GET /api/admin/stats
-// Returns dashboard counts: users, codes (active/used), products (active/inactive), stores.
-// Admin only.
+// Returns dashboard counts: users, codes (active/used), products, stores.
 
-const { adminClient } = require("../_lib/supabase");
+const {
+  countRows,
+  listTable,
+} = require("../_lib/supabase");
 const { withAdmin, json } = require("../_lib/auth");
 
 module.exports = withAdmin(async ({ profile }) => {
-  const supabase = adminClient();
-
-  // Run independent queries in parallel
-  const [
-    usersRes,
-    codesRes,
-    productsRes,
-    storesRes,
-    bannedRes,
-  ] = await Promise.all([
-    supabase.from("profiles").select("id", { count: "exact", head: true }),
-    supabase.from("registration_codes").select("id, is_used", { count: "exact" }),
-    supabase.from("admin_products").select("id, is_active", { count: "exact" }),
-    supabase.from("stores").select("id", { count: "exact", head: true }),
-    supabase.from("profiles").select("id", { count: "exact", head: true }).eq("is_banned", true),
+  const [usersRes, codesRes, productsRes, storesRes, bannedRes] = await Promise.all([
+    countRows("profiles"),
+    listTable("registration_codes", { select: "id,is_used", limit: 1000 }),
+    listTable("admin_products", { select: "id,is_active", limit: 1000 }),
+    countRows("stores"),
+    countRows("profiles", "is_banned=eq.true"),
   ]);
 
   const codesTotal = codesRes.data?.length || 0;
@@ -37,16 +30,8 @@ module.exports = withAdmin(async ({ profile }) => {
       users: usersRes.count || 0,
       bannedUsers: bannedRes.count || 0,
       stores: storesRes.count || 0,
-      codes: {
-        total: codesTotal,
-        used: codesUsed,
-        active: codesActive,
-      },
-      products: {
-        total: productsTotal,
-        active: productsActive,
-        inactive: productsInactive,
-      },
+      codes: { total: codesTotal, used: codesUsed, active: codesActive },
+      products: { total: productsTotal, active: productsActive, inactive: productsInactive },
     },
     timestamp: new Date().toISOString(),
   });

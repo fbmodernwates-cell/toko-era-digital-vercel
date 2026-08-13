@@ -1,15 +1,16 @@
 // Auth helpers for Vercel serverless functions.
 // Verifies the caller's JWT, loads their profile, and enforces admin role.
 
-const { adminClient } = require("./supabase");
+const {
+  getUserByAccessToken,
+  getProfile,
+} = require("./supabase");
 
 const ADMIN_ROLES = new Set(["admin", "superadmin"]);
 
 /**
  * Extracts and verifies the Bearer token from the Authorization header.
  * Returns { user, error, status }.
- *   - On success: { user, error: null, status: 200 }
- *   - On failure: { user: null, error: "<message>", status: 401|500 }
  */
 async function getUserFromRequest(req) {
   const authHeader = req.headers["authorization"] || "";
@@ -21,14 +22,12 @@ async function getUserFromRequest(req) {
     return { user: null, error: "Missing Authorization Bearer token", status: 401 };
   }
 
-  const supabase = adminClient();
-  const { data, error } = await supabase.auth.getUser(token);
-
-  if (error || !data?.user) {
+  const { user, error } = await getUserByAccessToken(token);
+  if (error || !user) {
     return { user: null, error: "Invalid or expired token", status: 401 };
   }
 
-  return { user: data.user, error: null, status: 200 };
+  return { user, error: null, status: 200 };
 }
 
 /**
@@ -39,18 +38,12 @@ async function requireAdmin(req) {
   const { user, error, status } = await getUserFromRequest(req);
   if (error) return { user: null, profile: null, error, status };
 
-  const supabase = adminClient();
-  const { data: profile, error: profileErr } = await supabase
-    .from("profiles")
-    .select("id, email, role, is_banned, full_name")
-    .eq("id", user.id)
-    .maybeSingle();
-
+  const { data: profile, error: profileErr } = await getProfile(user.id);
   if (profileErr) {
     return {
       user: null,
       profile: null,
-      error: "Failed to load profile: " + profileErr.message,
+      error: "Failed to load profile: " + profileErr,
       status: 500,
     };
   }

@@ -8,9 +8,6 @@
     "deploy": "vercel --prod",
     "lint": "echo 'no linter configured'"
   },
-  "dependencies": {
-    "@supabase/supabase-js": "^2.38.4"
-  },
   "engines": {
     "node": "20.x"
   }
