@@ -7,6 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.10);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -131,10 +132,7 @@
     </div>
 
     <script>
-        const SUPABASE_URL = 'https://msqgmtvbxzhsbleraysu.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1zcWdtdHZieHpoc2JsZXJheXN1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYzMjMzMzYsImV4cCI6MjEwMTg5OTMzNn0.s0tiVzsDYkr6s_PbNZD8wCzI5IAjvCfEdK9F0uW4Rls';
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        let currentUser = null;
+                let currentUser = null;
 
         async function getUser() {
             const { data: { user } } = await supabase.auth.getUser();
