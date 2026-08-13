@@ -72,7 +72,15 @@
     </style>
 </head>
 <body>
-    <nav class="nav">
+    <div id="authOverlay" style="display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--bg)">
+        <div class="card" style="max-width:420px;text-align:center">
+            <h1 style="margin-bottom:8px">Admin</h1>
+            <p class="sub" style="margin-bottom:18px">Silakan login terlebih dahulu</p>
+            <a href="/login.html" class="btn" style="display:inline-block;width:auto;padding:10px 22px;text-decoration:none">Ke Login</a>
+        </div>
+    </div>
+
+    <nav class="nav" id="adminNav" style="display:none">
         <a class="nav-brand" href="/">TOKO ERA DIGITAL</a>
         <div class="nav-right">
             <span class="nav-user">Admin: <strong id="adminName">...</strong></span>
@@ -80,7 +88,7 @@
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container" id="adminContainer" style="display:none">
         <div class="header">
             <h1>Dashboard Admin</h1>
             <p>Kelola kode pendaftaran dan produk etalase</p>
@@ -253,8 +261,9 @@
             const isAdmin = user.user_metadata?.role === 'admin';
             if (!isAdmin) { window.location.href = '/toko.html'; return; }
             adminUser = user;
-            document.getElementById('adminName').textContent = user.email;
-            document.getElementById('adminEmail').textContent = user.email;
+            document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('adminNav').style.display = 'flex';
+            document.getElementById('adminContainer').style.display = 'block';
             document.getElementById('adminName').textContent = user.email;
             document.getElementById('adminEmail').textContent = user.email;
             loadCodes();
