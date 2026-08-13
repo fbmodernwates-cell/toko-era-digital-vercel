@@ -208,13 +208,13 @@
                     const msg = authError.message || '';
                     let message = 'Gagal daftar: ' + msg;
                     if (msg.includes('over_email_send_rate_limit')) {
-                        message = 'Terlalu banyak percobaan daftar. Tunggu beberapa saat atau cek Email Confirmation di Supabase Dashboard.';
+                        message = 'Terlalu banyak percobaan daftar. Tunggu beberapa menit sebelum coba lagi.';
                     } else if (msg.includes('email_address_invalid')) {
                         message = 'Format email tidak valid. Coba email lain.';
                     } else if (msg.includes('User already registered')) {
-                        message = 'Email ini sudah terdaftar. Coba login.';
-                    } else if (msg.toLowerCase().includes('email') && msg.toLowerCase().includes('confirm')) {
-                        message = 'Email confirmation aktif. Cek inbox email untuk verifikasi, lalu login.';
+                        message = 'Email ini sudah terdaftar. Coba login atau lupa password.';
+                    } else if (msg.includes('Password should be at least')) {
+                        message = 'Password minimal 6 karakter.';
                     }
                     showAlert(message, 'error');
                     submitBtn.disabled = false;
@@ -267,12 +267,15 @@
                     console.error('Profile fetch error', err);
                 }
 
+                // Karena email confirmation dimatikan (mailer_autoconfirm=true),
+                // authData.session sudah ada — Sobat langsung login.
                 if (authData.session) {
-                    showAlert('Berhasil! Mengalihkan...', 'success');
+                    showAlert('Berhasil! Mengalihkan ke dashboard toko...', 'success');
                     setTimeout(() => {
                         window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
                     }, 1000);
                 } else {
+                    // Fallback jika session tidak ada
                     showAlert('Pendaftaran berhasil. Silakan login untuk melanjutkan.', 'success');
                     setTimeout(() => {
                         window.location.href = '/login.html';

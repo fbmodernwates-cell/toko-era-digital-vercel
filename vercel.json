@@ -1,13 +1,15 @@
 {
   "version": 2,
   "rewrites": [
-    { "source": "/toko",      "destination": "/toko.html" },
-    { "source": "/login",     "destination": "/login.html" },
-    { "source": "/register",  "destination": "/register.html" },
-    { "source": "/admin",     "destination": "/admin.html" },
-    { "source": "/api-docs",  "destination": "/api-docs.html" },
-    { "source": "/store",     "destination": "/store.html" },
-    { "source": "/s/:userId", "destination": "/store.html" }
+    { "source": "/toko",              "destination": "/toko.html" },
+    { "source": "/login",             "destination": "/login.html" },
+    { "source": "/register",          "destination": "/register.html" },
+    { "source": "/admin",             "destination": "/admin.html" },
+    { "source": "/api-docs",          "destination": "/api-docs.html" },
+    { "source": "/store",             "destination": "/store.html" },
+    { "source": "/s/:userId",         "destination": "/store.html" },
+    { "source": "/forgot-password",   "destination": "/forgot-password.html" },
+    { "source": "/reset-password",    "destination": "/reset-password.html" }
   ],
   "functions": {
     "api/**/*.js": {
