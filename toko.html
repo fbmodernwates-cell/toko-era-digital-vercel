@@ -152,6 +152,27 @@
             <div class="empty">Memuat profil toko...</div>
         </div>
 
+        <!-- BAGIKAN TOKO — Link unik untuk dipasarkan -->
+        <div class="section-title">🔗 Link Toko Online Saya</div>
+        <div id="shareCard" style="background:var(--bg-card);padding:16px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:24px">
+            <div style="font-size:.82rem;color:var(--text-muted);margin-bottom:8px">Bagikan link ini ke calon pembeli. Siapa pun bisa lihat toko Sobat tanpa login.</div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;background:var(--bg);padding:10px 12px;border-radius:8px;border:1px solid #E5E7EB;margin-bottom:10px">
+                <code id="storePublicUrl" style="flex:1;min-width:0;font-size:.8rem;word-break:break-all;color:var(--primary-dark);font-weight:600">Memuat...</code>
+                <button id="copyStoreLinkBtn" style="padding:6px 12px;border:none;border-radius:6px;background:var(--primary);color:#fff;font-weight:600;font-size:.78rem;cursor:pointer;font-family:inherit;flex-shrink:0">Salin</button>
+            </div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap">
+                <a id="shareWaBtn" href="#" target="_blank" style="padding:8px 14px;background:#10B981;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.82rem;flex:1;min-width:120px;text-align:center">💬 Bagikan via WhatsApp</a>
+                <a id="shareFbBtn" href="#" target="_blank" style="padding:8px 14px;background:#1877F2;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.82rem;flex:1;min-width:120px;text-align:center">📘 Facebook</a>
+                <a id="shareTgBtn" href="#" target="_blank" style="padding:8px 14px;background:#0088CC;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;font-size:.82rem;flex:1;min-width:120px;text-align:center">✈️ Telegram</a>
+            </div>
+            <div id="qrCodeBox" style="text-align:center;margin-top:14px;display:none">
+                <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:6px">QR Code toko Sobat (scan untuk buka)</div>
+                <img id="qrCodeImg" alt="QR Code" style="max-width:180px;width:100%;height:auto;border-radius:8px;background:#fff;padding:8px;border:1px solid #E5E7EB">
+                <div style="font-size:.72rem;color:var(--text-muted);margin-top:6px"><a href="#" id="downloadQrBtn" style="color:var(--primary-dark);font-weight:600;text-decoration:none">⬇️ Download QR Code</a></div>
+            </div>
+            <button id="toggleQrBtn" style="margin-top:10px;padding:6px 12px;background:#E5E7EB;border:none;border-radius:6px;font-weight:600;font-size:.78rem;cursor:pointer;font-family:inherit;width:100%">📱 Tampilkan QR Code</button>
+        </div>
+
         <!-- FORM PROFIL TOKO -->
         <div class="section-title">Ubah Profil Toko</div>
         <form id="storeForm" class="store-form">
@@ -317,17 +338,57 @@
             const card = document.getElementById('storeCard');
             if (!data) {
                 card.innerHTML = '<div class="empty">Belum ada profil toko. Isi form di bawah untuk membuatnya.</div>';
-                return;
+            } else {
+                card.innerHTML = `<div class="product-card" style="grid-column:1/-1">
+                    <div class="body" style="padding:16px">
+                        <span class="badge badge-user">Toko Saya</span>
+                        <h3 style="font-size:1.05rem;font-weight:700;margin-top:6px">${escapeHtml(data.store_name || 'Toko Saya')}</h3>
+                        <div class="desc" style="font-size:.85rem;margin-top:6px">${escapeHtml(data.description || '')}</div>
+                    </div>
+                </div>`;
+                document.getElementById('storeName').value = data.store_name || '';
+                document.getElementById('storeDesc').value = data.description || '';
             }
-            card.innerHTML = `<div class="product-card" style="grid-column:1/-1">
-                <div class="body" style="padding:16px">
-                    <span class="badge badge-user">Toko Saya</span>
-                    <h3 style="font-size:1.05rem;font-weight:700;margin-top:6px">${escapeHtml(data.store_name || 'Toko Saya')}</h3>
-                    <div class="desc" style="font-size:.85rem;margin-top:6px">${escapeHtml(data.description || '')}</div>
-                </div>
-            </div>`;
-            document.getElementById('storeName').value = data.store_name || '';
-            document.getElementById('storeDesc').value = data.description || '';
+            // Always setup share link (works even if store profile not set yet)
+            setupShareLink();
+        }
+
+        // ============ SHARE LINK ============
+        function setupShareLink() {
+            const publicUrl = window.location.origin + '/s/' + currentUser.id;
+            document.getElementById('storePublicUrl').textContent = publicUrl;
+
+            document.getElementById('copyStoreLinkBtn').addEventListener('click', () => {
+                navigator.clipboard.writeText(publicUrl).then(() => {
+                    const btn = document.getElementById('copyStoreLinkBtn');
+                    const original = btn.textContent;
+                    btn.textContent = '✓ Tersalin!';
+                    setTimeout(() => { btn.textContent = original; }, 1500);
+                }).catch(() => {
+                    prompt('Salin link toko ini:', publicUrl);
+                });
+            });
+
+            const shareText = encodeURIComponent('Halo! Kunjungi toko online saya di TOKO ERA DIGITAL: ' + publicUrl);
+            document.getElementById('shareWaBtn').href = 'https://wa.me/?text=' + shareText;
+            document.getElementById('shareFbBtn').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(publicUrl);
+            document.getElementById('shareTgBtn').href = 'https://t.me/share/url?url=' + encodeURIComponent(publicUrl) + '&text=' + shareText;
+
+            document.getElementById('toggleQrBtn').addEventListener('click', () => {
+                const box = document.getElementById('qrCodeBox');
+                const btn = document.getElementById('toggleQrBtn');
+                if (box.style.display === 'none' || !box.style.display) {
+                    const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=' + encodeURIComponent(publicUrl);
+                    document.getElementById('qrCodeImg').src = qrUrl;
+                    document.getElementById('downloadQrBtn').href = qrUrl;
+                    document.getElementById('downloadQrBtn').download = 'qr-toko-' + currentUser.id.substring(0, 8) + '.png';
+                    box.style.display = 'block';
+                    btn.textContent = '📱 Sembunyikan QR Code';
+                } else {
+                    box.style.display = 'none';
+                    btn.textContent = '📱 Tampilkan QR Code';
+                }
+            });
         }
 
         document.getElementById('storeForm').addEventListener('submit', async (e) => {

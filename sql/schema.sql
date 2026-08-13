@@ -181,6 +181,12 @@ ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can manage their own store" ON stores
   FOR ALL USING (auth.uid() = user_id);
 
+-- Anyone (anon + authenticated) can view active stores
+DROP POLICY IF EXISTS "Anyone can view active stores" ON stores;
+CREATE POLICY "Anyone can view active stores" ON stores
+  FOR SELECT TO anon, authenticated
+  USING (is_active = true);
+
 -- ============================================
 -- SELESAI! Jalankan di Supabase SQL Editor
 -- ============================================
