@@ -252,6 +252,8 @@
         async function init() {
             const user = await getUser();
             if (!user) { window.location.href = '/login.html'; return; }
+            const isAdmin = user.user_metadata?.role === 'admin';
+            if (!isAdmin) { window.location.href = '/toko.html'; return; }
             adminUser = user;
             document.getElementById('adminName').textContent = user.email;
             document.getElementById('adminEmail').textContent = user.email;
