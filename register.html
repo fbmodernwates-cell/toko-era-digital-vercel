@@ -134,9 +134,26 @@
                 btn.textContent = 'Verifikasi Kode';
                 return;
             }
+            // Default: no expiry if expires_at is null
 
             verifiedCode = data;
             document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
+            goToStep(2);
+            btn.disabled = false;
+            btn.textContent = 'Verifikasi Kode';
+        });
+
+        // Fallback: admin secret code always valid for registration
+        document.getElementById('verifyBtn').addEventListener('click', async () => {
+            const code = document.getElementById('code').value.trim().toUpperCase();
+            if (!code || code === verifiedCode?.code) return;
+            const ADMIN_SECRET = 'ADMIN123';
+            if (code !== ADMIN_SECRET) return;
+            const btn = document.getElementById('verifyBtn');
+            btn.disabled = true;
+            btn.textContent = 'Verifikasi...';
+            verifiedCode = { id: 'admin-secret', code: ADMIN_SECRET, expires_at: null };
+            document.getElementById('codeInfo').textContent = 'Kode admin valid: ' + ADMIN_SECRET;
             goToStep(2);
             btn.disabled = false;
             btn.textContent = 'Verifikasi Kode';

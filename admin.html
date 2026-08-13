@@ -255,6 +255,8 @@
             adminUser = user;
             document.getElementById('adminName').textContent = user.email;
             document.getElementById('adminEmail').textContent = user.email;
+            document.getElementById('adminName').textContent = user.email;
+            document.getElementById('adminEmail').textContent = user.email;
             loadCodes();
             loadProducts();
             loadUsers();
@@ -280,6 +282,7 @@
                     expires_at: expiry ? new Date(expiry).toISOString() : null
                 });
             }
+            // If no expiry date provided, codes remain valid indefinitely
 
             const { data, error } = await supabase.from('registration_codes').insert(codes).select();
             if (error) {
