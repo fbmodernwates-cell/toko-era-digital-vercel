@@ -215,8 +215,28 @@
                 await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
             }
 
-            showAlert('Berhasil! Mengalihkan ke toko...', 'success');
-            setTimeout(() => { window.location.href = '/toko.html'; }, 1500);
+            showAlert('Berhasil! Mengalihkan...', 'success');
+
+            // Cek apakah user otomatis login setelah daftar
+            const { data: sessionData } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+            if (session?.user) {
+                const userId = session.user.id;
+                // Pastikan role admin tersimpan jika register via kode admin
+                if (isAdminRegister) {
+                    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
+                }
+                // Redirect sesuai role
+                const role = session.user.user_metadata?.role;
+                setTimeout(() => {
+                    window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
+                }, 1000);
+            } else {
+                // Perlu login manual / verifikasi email
+                setTimeout(() => {
+                    window.location.href = '/login.html';
+                }, 1000);
+            }
         });
     </script>
 </body>
