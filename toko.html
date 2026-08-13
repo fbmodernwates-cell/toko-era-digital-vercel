@@ -100,6 +100,26 @@
         <div id="userProducts" class="product-grid">
             <div class="empty">Belum ada produk. Klik "Tambah Produk" untuk mulai!</div>
         </div>
+
+        <!-- PROFIL TOKO -->
+        <div class="section-title">Profil Toko</div>
+        <div id="storeCard" class="product-grid" style="margin-bottom:32px">
+            <div class="empty">Memuat profil toko...</div>
+        </div>
+
+        <!-- FORM PROFIL TOKO -->
+        <div class="section-title">Ubah Profil Toko</div>
+        <form id="storeForm" style="background:var(--bg-card);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);max-width:640px;margin-bottom:32px">
+            <div class="form-group">
+                <label>Nama Toko</label>
+                <input type="text" id="storeName" placeholder="Contoh: Toko Sejahtera" required>
+            </div>
+            <div class="form-group">
+                <label>Deskripsi</label>
+                <textarea id="storeDesc" placeholder="Deskripsi singkat toko..."></textarea>
+            </div>
+            <button type="submit" class="btn-save" style="padding:10px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit">Simpan Profil Toko</button>
+        </form>
     </div>
 
     <!-- MODAL TAMBAH PRODUK -->
@@ -158,7 +178,37 @@
             document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
             loadAdminProducts();
             loadUserProducts();
+            loadStore();
         }
+
+        // PROFIL TOKO
+        async function loadStore() {
+            const { data } = await supabase.from('stores').select('*').eq('user_id', currentUser.id).maybeSingle();
+            const card = document.getElementById('storeCard');
+            if (!data) {
+                card.innerHTML = '<div class="empty">Belum ada profil toko. Isi form di bawah untuk membuatnya.</div>';
+                document.getElementById('storeName').value = '';
+                document.getElementById('storeDesc').value = '';
+                return;
+            }
+            card.innerHTML = '<div class="product-card"><span class="badge badge-user">Toko Saya</span><h3>' + (data.store_name || 'Toko Saya') + '</h3><div class="desc'> + (data.description ? data.description : '') + '</div></div>';
+            document.getElementById('storeName').value = data.store_name || '';
+            document.getElementById('storeDesc').value = data.description || '';
+        }
+
+        document.getElementById('storeForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('storeName').value.trim();
+            const description = document.getElementById('storeDesc').value.trim();
+            const { error } = await supabase.from('stores').upsert({
+                user_id: currentUser.id,
+                store_name: name || 'Toko Saya',
+                description: description || null,
+                is_active: true
+            }, { onConflict: 'user_id' });
+            if (error) { alert('Gagal: ' + error.message); return; }
+            loadStore();
+        });
 
         // PRODUK ETALASE (Admin)
         async function loadAdminProducts() {
