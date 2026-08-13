@@ -147,6 +147,13 @@
         async function init() {
             const user = await getUser();
             if (!user) { window.location.href = '/login.html'; return; }
+            const { data: profile, error: profileError } = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
+            if (profileError || profile?.is_banned) {
+                await supabase.auth.signOut();
+                alert('Akun Anda dibanned. Hubungi admin.');
+                window.location.href = '/login.html';
+                return;
+            }
             currentUser = user;
             document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
             loadAdminProducts();
