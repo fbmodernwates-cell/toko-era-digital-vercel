@@ -186,7 +186,7 @@
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: email,
                 password: password,
-                options: { data: metadata }
+                options: { data: metadata, email_confirm: false }
             });
 
             if (authError) {
@@ -217,32 +217,27 @@
 
             showAlert('Berhasil! Mengalihkan...', 'success');
 
-            // Cek apakah user otomatis login setelah daftar
+            // Login otomatis setelah daftar untuk memastikan session aktif
             try {
-                const { data: sessionData } = await supabase.auth.getSession();
-                const session = sessionData?.session;
-                if (session?.user) {
-                    const userId = session.user.id;
-                    // Pastikan role admin tersimpan jika register via kode admin
-                    if (isAdminRegister) {
-                        await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
-                    }
-                    // Redirect sesuai role
-                    const role = session.user.user_metadata?.role;
-                    setTimeout(() => {
-                        window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
-                    }, 1000);
-                } else {
-                    // Perlu login manual / verifikasi email
-                    setTimeout(() => {
-                        window.location.href = '/login.html';
-                    }, 1000);
+                const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
+                    email,
+                    password
+                });
+                if (loginError || !loginData.user) {
+                    setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+                    return;
                 }
-            } catch (e) {
-                console.error('Session check failed', e);
+                const userId = loginData.user.id;
+                if (isAdminRegister) {
+                    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
+                }
+                const role = loginData.user.user_metadata?.role;
                 setTimeout(() => {
-                    window.location.href = '/login.html';
+                    window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
                 }, 1000);
+            } catch (e) {
+                console.error('Auto-login failed', e);
+                setTimeout(() => { window.location.href = '/login.html'; }, 1000);
             }
         });
     </script>
