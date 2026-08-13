@@ -1,0 +1,17 @@
+{
+  "name": "toko-era-digital",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Multi-tenant Toko Era Digital starter — static HTML frontend + Vercel serverless API + Supabase backend",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod",
+    "lint": "echo 'no linter configured'"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Docs - TOKO ERA DIGITAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root{--primary:#D2691E;--primary-dark:#8B4513;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
+        .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
+        .nav-brand{font-weight:900;font-size:1.2rem;color:var(--primary-dark);text-decoration:none}
+        .nav-right{display:flex;gap:16px;align-items:center}
+        .nav-link{font-size:.85rem;color:var(--primary-dark);text-decoration:none;font-weight:600;padding:8px 14px;border-radius:8px;transition:background .2s}
+        .nav-link:hover{background:#FFEDD5}
+        .container{max-width:960px;margin:0 auto;padding:20px 24px 60px}
+        .header{margin-bottom:32px}
+        .header h1{font-size:1.8rem;font-weight:800;margin-bottom:4px}
+        .header p{color:var(--text-muted);font-size:.95rem}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:24px;box-shadow:var(--shadow);margin-bottom:20px}
+        .card h2{font-size:1.1rem;font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+        .badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:.7rem;font-weight:700;font-family:'JetBrains Mono',monospace;text-transform:uppercase}
+        .get{background:#D1FAE5;color:#065F46}
+        .post{background:#FEF3C7;color:#92400E}
+        .put{background:#DBEAFE;color:#1E40AF}
+        .del{background:#FEE2E2;color:#DC2626}
+        .endpoint{display:flex;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+        .endpoint code{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:.95rem;background:#FFF7ED;padding:4px 10px;border-radius:6px;border:1px solid #FED7AA}
+        .desc{color:var(--text-muted);font-size:.88rem;margin:4px 0 12px}
+        pre{background:#1F2937;color:#F9FAFB;border-radius:10px;padding:14px;overflow-x:auto;font-family:'JetBrains Mono',monospace;font-size:.82rem;line-height:1.5}
+        pre .c{color:#9CA3AF}
+        pre .k{color:#FBBF24}
+        pre .s{color:#86EFAC}
+        pre .h{color:#60A5FA}
+        .auth-note{background:#FEF3C7;color:#92400E;border-radius:8px;padding:10px 14px;font-size:.82rem;margin:8px 0}
+        .try-it{background:#F0F9FF;border:1px solid #BAE6FD;border-radius:8px;padding:12px 16px;margin-top:12px}
+        .try-it h3{font-size:.9rem;font-weight:700;margin-bottom:8px;color:#0369A1}
+        .try-it label{display:block;font-size:.78rem;font-weight:600;color:#0369A1;margin-bottom:4px}
+        .try-it input,.try-it textarea,.try-it select{width:100%;padding:8px 10px;border:1px solid #BAE6FD;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.82rem;background:#FFF;margin-bottom:8px}
+        .try-it button{padding:8px 16px;background:#0EA5E9;color:#fff;border:none;border-radius:6px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem}
+        .try-it button:hover{background:#0284C7}
+        .response{margin-top:12px}
+        .response-label{font-size:.78rem;font-weight:700;color:#0369A1;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+        .status-badge{padding:2px 8px;border-radius:4px;background:#1F2937;color:#fff;font-size:.7rem;font-family:'JetBrains Mono',monospace}
+        .status-badge.ok{background:#10B981}
+        .status-badge.err{background:#EF4444}
+        pre.response-body{margin-top:6px;max-height:300px;overflow-y:auto}
+        @media(max-width:640px){
+            .container{padding:16px}
+            .card{padding:18px}
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <a class="nav-brand" href="/">TOKO ERA DIGITAL</a>
+        <div class="nav-right">
+            <a href="/admin" class="nav-link">Admin</a>
+            <a href="/" class="nav-link">Home</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="header">
+            <h1>API Documentation</h1>
+            <p>REST API layer untuk Toko Era Digital. Dibangun sebagai Vercel serverless functions, validasi JWT, dan service role key di server-side.</p>
+        </div>
+
+        <div class="card">
+            <h2>🔐 Authentication</h2>
+            <p style="color:var(--text-muted);font-size:.9rem;margin-bottom:12px">
+                Semua endpoint <code>/api/admin/*</code> dan <code>/api/me</code> memerlukan Bearer token (Supabase access token) yang didapat setelah login.
+            </p>
+            <pre><span class="c"># Contoh request dengan auth</span>
+curl <span class="h">https://your-domain.vercel.app/api/admin/stats</span> \
+  -H <span class="s">"Authorization: Bearer &lt;SUPABASE_ACCESS_TOKEN&gt;"</span></pre>
+            <div class="auth-note">
+                ⚠️ <strong>SUPABASE_SERVICE_ROLE_KEY</strong> hanya dipakai di server (di dalam <code>/api/*.js</code>).
+                Jangan pernah expose ke browser atau commit ke git.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📋 Public Endpoints</h2>
+
+            <div class="endpoint">
+                <span class="badge get">GET</span>
+                <code>/api/health</code>
+            </div>
+            <p class="desc">Health check — verifikasi Supabase env vars sudah dikonfigurasi. Tidak butuh auth.</p>
+            <pre><span class="c"># Contoh response</span>
+{
+  <span class="k">"status"</span>: <span class="s">"ok"</span>,
+  <span class="k">"service"</span>: <span class="s">"toko-era-digital-api"</span>,
+  <span class="k">"timestamp"</span>: <span class="s">"2026-08-13T09:00:00.000Z"</span>,
+  <span class="k">"env"</span>: { <span class="k">"SUPABASE_URL"</span>: <span class="k">true</span>, <span class="k">"SUPABASE_ANON_KEY"</span>: <span class="k">true</span>, <span class="k">"SUPABASE_SERVICE_ROLE_KEY"</span>: <span class="k">true</span> }
+}</pre>
+        </div>
+
+        <div class="card">
+            <h2>👤 User Endpoints</h2>
+
+            <div class="endpoint">
+                <span class="badge get">GET</span>
+                <code>/api/me</code>
+            </div>
+            <p class="desc">Mengembalikan profil user yang sedang login berdasarkan Bearer token, beserta info store jika user adalah mitra.</p>
+            <pre>curl <span class="h">https://your-domain.vercel.app/api/me</span> \
+  -H <span class="s">"Authorization: Bearer &lt;token&gt;"</span></pre>
+        </div>
+
+        <div class="card">
+            <h2>🛡️ Admin Endpoints</h2>
+            <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:16px">
+                Semua endpoint di bawah ini memerlukan admin role. Server akan memverifikasi JWT dan cek <code>profiles.role = 'admin'</code> sebelum memproses request.
+            </p>
+
+            <div class="endpoint">
+                <span class="badge get">GET</span>
+                <code>/api/admin/stats</code>
+            </div>
+            <p class="desc">Dashboard stats: jumlah users, codes, products, stores, dan banned users.</p>
+
+            <div class="endpoint" style="margin-top:24px">
+                <span class="badge get">GET</span>
+                <code>/api/admin/users?role=&banned=&q=&limit=</code>
+            </div>
+            <p class="desc">Daftar semua profiles. Filter opsional: <code>?role=mitra</code>, <code>?banned=true</code>, <code>?q=keyword</code>.</p>
+
+            <div class="endpoint" style="margin-top:24px">
+                <span class="badge get">GET</span>
+                <span class="badge post">POST</span>
+                <span class="badge del">DELETE</span>
+                <code>/api/admin/products</code>
+            </div>
+            <p class="desc">CRUD produk etalase. POST body: <code>{ name, price, category?, stock?, description?, is_active? }</code>. DELETE: <code>?id=&lt;uuid&gt;</code>.</p>
+            <pre><span class="c"># Create product</span>
+curl -X POST <span class="h">https://your-domain.vercel.app/api/admin/products</span> \
+  -H <span class="s">"Authorization: Bearer &lt;token&gt;"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"name":"Kaos Distro","price":150000,"category":"Pakaian","stock":100}'</span></pre>
+
+            <div class="endpoint" style="margin-top:24px">
+                <span class="badge get">GET</span>
+                <span class="badge post">POST</span>
+                <span class="badge del">DELETE</span>
+                <code>/api/admin/codes</code>
+            </div>
+            <p class="desc">CRUD kode pendaftaran. POST body: <code>{ count?: 1, prefix?: "TED", expires_at?: "ISO" }</code>. DELETE: <code>?id=&lt;uuid&gt;</code>.</p>
+            <pre><span class="c"># Generate 5 codes</span>
+curl -X POST <span class="h">https://your-domain.vercel.app/api/admin/codes</span> \
+  -H <span class="s">"Authorization: Bearer &lt;token&gt;"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"count":5}'</span></pre>
+
+            <div class="endpoint" style="margin-top:24px">
+                <span class="badge post">POST</span>
+                <code>/api/admin/ban</code>
+            </div>
+            <p class="desc">Ban/unban user. Body: <code>{ userId, banned }</code>. Tidak bisa ban admin lain atau diri sendiri.</p>
+
+            <div class="endpoint" style="margin-top:24px">
+                <span class="badge post">POST</span>
+                <code>/api/admin/reset-password</code>
+            </div>
+            <p class="desc">Reset password user lain via Auth Admin API. Body: <code>{ userId, newPassword? }</code>. Jika <code>newPassword</code> kosong, server generate password aman 16 karakter.</p>
+            <pre><span class="c"># Reset password (auto-generated)</span>
+curl -X POST <span class="h">https://your-domain.vercel.app/api/admin/reset-password</span> \
+  -H <span class="s">"Authorization: Bearer &lt;token&gt;"</span> \
+  -H <span class="s">"Content-Type: application/json"</span> \
+  -d <span class="s">'{"userId":"uuid-here"}'</span>
+
+<span class="c"># Response</span>
+{
+  <span class="k">"success"</span>: <span class="k">true</span>,
+  <span class="k">"target"</span>: { <span class="k">"id"</span>: <span class="s">"uuid"</span>, <span class="k">"email"</span>: <span class="s">"user@example.com"</span> },
+  <span class="k">"generated"</span>: <span class="k">true</span>,
+  <span class="k">"temporaryPassword"</span>: <span class="s">"aB3!xY9#kLm7pQr$"</span>,
+  <span class="k">"performedBy"</span>: <span class="s">"admin@example.com"</span>
+}</pre>
+        </div>
+
+        <div class="card">
+            <h2>🧪 Live Tester</h2>
+            <p style="color:var(--text-muted);font-size:.88rem;margin-bottom:12px">
+                Butuh access token dari login Supabase. Buka <a href="/admin" style="color:var(--primary-dark);font-weight:600">Admin Panel</a> → login → copy token dari DevTools Application → LocalStorage, atau pakai endpoint ini dengan token yang sudah ada.
+            </p>
+
+            <div class="try-it">
+                <h3>Request</h3>
+                <label for="tMethod">Method</label>
+                <select id="tMethod">
+                    <option>GET</option><option>POST</option><option>PUT</option><option>DELETE</option>
+                </select>
+                <label for="tPath">Path</label>
+                <input id="tPath" type="text" value="/api/health" placeholder="/api/admin/stats">
+                <label for="tToken">Bearer Token (opsional untuk endpoint publik)</label>
+                <input id="tToken" type="password" placeholder="eyJhbGciOiJIUzI1NiIs...">
+                <div id="bodyWrap" style="display:none">
+                    <label for="tBody">Request Body (JSON)</label>
+                    <textarea id="tBody" rows="4" placeholder='{"name":"Test"}'></textarea>
+                </div>
+                <button id="sendBtn">Send Request</button>
+
+                <div class="response">
+                    <div class="response-label">
+                        Response
+                        <span id="statusBadge" class="status-badge" style="display:none">—</span>
+                    </div>
+                    <pre class="response-body" id="responseBody">// Response akan muncul di sini</pre>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>📁 Struktur Folder</h2>
+            <pre>api/
+├── _lib/
+│   ├── supabase.js     <span class="c"># Supabase admin/anon client factory</span>
+│   └── auth.js         <span class="c"># JWT verification + withAdmin/withUser helpers</span>
+├── health.js           <span class="c"># GET /api/health</span>
+├── me.js                <span class="c"># GET /api/me</span>
+└── admin/
+    ├── stats.js         <span class="c"># GET /api/admin/stats</span>
+    ├── users.js         <span class="c"># GET /api/admin/users</span>
+    ├── products.js      <span class="c"># GET/POST/DELETE /api/admin/products</span>
+    ├── codes.js         <span class="c"># GET/POST/DELETE /api/admin/codes</span>
+    ├── ban.js           <span class="c"># POST /api/admin/ban</span>
+    └── reset-password.js <span class="c"># POST /api/admin/reset-password</span></pre>
+        </div>
+    </div>
+
+    <script>
+        const tMethod = document.getElementById('tMethod');
+        const tPath = document.getElementById('tPath');
+        const tToken = document.getElementById('tToken');
+        const tBody = document.getElementById('tBody');
+        const bodyWrap = document.getElementById('bodyWrap');
+        const sendBtn = document.getElementById('sendBtn');
+        const responseBody = document.getElementById('responseBody');
+        const statusBadge = document.getElementById('statusBadge');
+
+        tMethod.addEventListener('change', () => {
+            bodyWrap.style.display = ['POST','PUT','PATCH'].includes(tMethod.value) ? 'block' : 'none';
+        });
+
+        sendBtn.addEventListener('click', async () => {
+            responseBody.textContent = 'Loading...';
+            statusBadge.style.display = 'none';
+            try {
+                const opts = { method: tMethod.value };
+                const headers = {};
+                if (tToken.value.trim()) headers['Authorization'] = 'Bearer ' + tToken.value.trim();
+                if (['POST','PUT','PATCH'].includes(tMethod.value) && tBody.value.trim()) {
+                    headers['Content-Type'] = 'application/json';
+                    opts.body = tBody.value;
+                }
+                opts.headers = headers;
+                const res = await fetch(tPath.value, opts);
+                statusBadge.style.display = 'inline-block';
+                statusBadge.textContent = 'HTTP ' + res.status;
+                statusBadge.className = 'status-badge ' + (res.ok ? 'ok' : 'err');
+                const text = await res.text();
+                try {
+                    responseBody.textContent = JSON.stringify(JSON.parse(text), null, 2);
+                } catch {
+                    responseBody.textContent = text || '(empty body)';
+                }
+            } catch (err) {
+                statusBadge.style.display = 'inline-block';
+                statusBadge.textContent = 'ERR';
+                statusBadge.className = 'status-badge err';
+                responseBody.textContent = 'Request failed: ' + err;
+            }
+        });
+    </script>
+</body>
+</html>

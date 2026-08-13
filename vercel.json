@@ -1,20 +1,15 @@
 {
   "rewrites": [
-    {
-      "source": "/toko",
-      "destination": "/toko.html"
-    },
-    {
-      "source": "/login",
-      "destination": "/login.html"
-    },
-    {
-      "source": "/register",
-      "destination": "/register.html"
-    },
-    {
-      "source": "/admin",
-      "destination": "/admin.html"
+    { "source": "/toko",      "destination": "/toko.html" },
+    { "source": "/login",     "destination": "/login.html" },
+    { "source": "/register",  "destination": "/register.html" },
+    { "source": "/admin",     "destination": "/admin.html" },
+    { "source": "/api-docs",  "destination": "/api-docs.html" }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "memory": 256,
+      "maxDuration": 10
     }
-  ]
+  }
 }

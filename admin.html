@@ -68,6 +68,29 @@
         .badge-yellow{background:#FEF3C7;color:#92400E}
         .empty{text-align:center;padding:32px;color:var(--text-muted)}
 
+        /* STATS GRID */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
+        .stat-card{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+        .stat-card .label{font-size:.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+        .stat-card .value{font-size:2rem;font-weight:900;color:var(--primary-dark);line-height:1}
+        .stat-card .sub{font-size:.78rem;color:var(--text-muted);margin-top:6px}
+
+        /* MODAL */
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+        .modal-overlay.show{display:flex}
+        .modal{background:#fff;border-radius:var(--radius);max-width:520px;width:100%;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+        .modal h3{font-size:1.3rem;font-weight:800;margin-bottom:8px}
+        .modal p{color:var(--text-muted);font-size:.9rem;margin-bottom:16px}
+        .modal .temp-pass{background:var(--bg);border:2px dashed var(--primary);border-radius:10px;padding:16px;text-align:center;font-family:monospace;font-size:1.4rem;font-weight:700;color:var(--primary-dark);letter-spacing:2px;margin:16px 0;user-select:all;word-break:break-all}
+        .modal .copy-btn{display:inline-block;margin-top:8px;padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem}
+        .modal .copy-btn:hover{background:var(--primary-dark)}
+        .modal .warn{background:#FEF3C7;color:#92400E;border-radius:8px;padding:10px 14px;font-size:.82rem;margin-top:8px}
+        .modal .close-btn{display:block;margin:20px auto 0;padding:10px 24px;background:#E5E7EB;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit}
+
+        /* NAV LINKS */
+        .nav-link{font-size:.85rem;color:var(--primary-dark);text-decoration:none;font-weight:600;padding:8px 14px;border-radius:8px;transition:background .2s}
+        .nav-link:hover{background:#FFEDD5}
+
         @media(max-width:600px){.form-row{flex-direction:column}.form-group{min-width:100%}}
     </style>
 </head>
@@ -83,6 +106,7 @@
     <nav class="nav" id="adminNav" style="display:none">
         <a class="nav-brand" href="/">TOKO ERA DIGITAL</a>
         <div class="nav-right">
+            <a href="/api-docs" class="nav-link">API Docs</a>
             <span class="nav-user">Admin: <strong id="adminName">...</strong></span>
             <button class="btn-logout" id="logoutBtn">Logout</button>
         </div>
@@ -91,7 +115,15 @@
     <div class="container" id="adminContainer" style="display:none">
         <div class="header">
             <h1>Dashboard Admin</h1>
-            <p>Kelola kode pendaftaran dan produk etalase</p>
+            <p>Kelola kode pendaftaran, produk etalase, dan mitra</p>
+        </div>
+
+        <!-- STATS GRID -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="label">Total Mitra</div><div class="value" id="statUsers">—</div><div class="sub" id="statBanned">—</div></div>
+            <div class="stat-card"><div class="label">Kode Aktif</div><div class="value" id="statCodesActive">—</div><div class="sub" id="statCodesUsed">—</div></div>
+            <div class="stat-card"><div class="label">Produk Aktif</div><div class="value" id="statProductsActive">—</div><div class="sub" id="statProductsTotal">—</div></div>
+            <div class="stat-card"><div class="label">Total Toko</div><div class="value" id="statStores">—</div><div class="sub">Stores registered</div></div>
         </div>
 
         <div class="tabs">
@@ -193,6 +225,9 @@
         <div class="tab-content" id="tab-users">
             <div class="card">
                 <h2>Mitra Terdaftar</h2>
+                <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px">
+                    Aksi <strong>Reset Password</strong> memanggil endpoint <code>/api/admin/reset-password</code> dengan service role key di server-side.
+                </p>
                 <div class="table-wrap">
                     <table>
                         <thead>
@@ -203,6 +238,18 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+
+        <!-- MODAL: temp password display -->
+        <div class="modal-overlay" id="resetModal">
+            <div class="modal">
+                <h3>Password Direset</h3>
+                <p>Password sementara untuk <strong id="resetTargetEmail">user</strong>:</p>
+                <div class="temp-pass" id="tempPassword">...</div>
+                <button class="copy-btn" id="copyTempBtn">Salin Password</button>
+                <div class="warn">⚠️ Bagikan password ini secara aman langsung ke user. User disarankan ganti password setelah login.</div>
+                <button class="close-btn" id="closeResetModal">Tutup</button>
             </div>
         </div>
 
@@ -299,6 +346,7 @@
             loadCodes();
             loadProducts();
             loadUsers();
+            loadStats();
         }
 
         // ============ KODE PENDAFTARAN ============
@@ -413,19 +461,95 @@
             let html = '';
             profiles.forEach(u => {
                 const status = u.is_banned ? '<span class="badge badge-red">Dibanned</span>' : '<span class="badge badge-green">Aktif</span>';
-                const actions = u.is_banned
+                const banBtn = u.is_banned
                     ? '<button class="btn btn-success btn-sm" onclick="restoreUser(\'' + u.id + '\')">Pulihkan</button>'
                     : '<button class="btn btn-danger btn-sm" onclick="banUser(\'' + u.id + '\')">Banned</button>';
+                const resetBtn = '<button class="btn btn-sm" style="background:#3B82F6;color:#fff;margin-right:4px" onclick="resetPassword(\'' + u.id + '\', \'' + (u.email || '').replace(/'/g, "\\'") + '\')">Reset Password</button>';
+                const actions = '<div style="display:flex;gap:4px;flex-wrap:wrap">' + resetBtn + banBtn + '</div>';
                 html += '<tr><td>' + (u.full_name || '-') + '</td><td>' + u.email + '</td><td>' + (u.phone || '-') + '</td><td>' + new Date(u.created_at).toLocaleDateString('id') + '</td><td>' + status + '</td><td>' + actions + '</td></tr>';
             });
             document.getElementById('usersList').innerHTML = html;
         }
+
+        // ============ RESET PASSWORD (via /api/admin/reset-password) ============
+        async function resetPassword(userId, email) {
+            if (!confirm('Reset password untuk ' + email + '?\\n\\nServer akan generate password sementara yang aman.')) return;
+            try {
+                const session = await supabase.auth.getSession();
+                const token = session.data?.session?.access_token;
+                if (!token) { alert('Sesi habis. Silakan login lagi.'); return; }
+
+                const res = await fetch('/api/admin/reset-password', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ userId: userId }) // no newPassword → server generates
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    alert('Gagal reset password: ' + (data.error || 'Unknown error') + (data.detail ? '\\n' + data.detail : ''));
+                    return;
+                }
+                // Show temp password in modal
+                document.getElementById('resetTargetEmail').textContent = data.target.email;
+                document.getElementById('tempPassword').textContent = data.temporaryPassword;
+                document.getElementById('resetModal').classList.add('show');
+            } catch (err) {
+                console.error('Reset password failed', err);
+                alert('Gagal: ' + (err.message || err));
+            }
+        }
+
+        // ============ STATS (via /api/admin/stats) ============
+        async function loadStats() {
+            try {
+                const session = await supabase.auth.getSession();
+                const token = session.data?.session?.access_token;
+                if (!token) return;
+                const res = await fetch('/api/admin/stats', {
+                    headers: { 'Authorization': 'Bearer ' + token }
+                });
+                if (!res.ok) return;
+                const json = await res.json();
+                const c = json.counts || {};
+                document.getElementById('statUsers').textContent = c.users ?? '—';
+                document.getElementById('statBanned').textContent = (c.bannedUsers || 0) + ' dibanned';
+                document.getElementById('statCodesActive').textContent = c.codes?.active ?? '—';
+                document.getElementById('statCodesUsed').textContent = (c.codes?.used || 0) + ' terpakai dari ' + (c.codes?.total || 0);
+                document.getElementById('statProductsActive').textContent = c.products?.active ?? '—';
+                document.getElementById('statProductsTotal').textContent = (c.products?.total || 0) + ' total produk';
+                document.getElementById('statStores').textContent = c.stores ?? '—';
+            } catch (err) {
+                console.warn('Stats load failed', err);
+            }
+        }
+
+        // Modal close handlers
+        document.getElementById('closeResetModal').addEventListener('click', () => {
+            document.getElementById('resetModal').classList.remove('show');
+        });
+        document.getElementById('copyTempBtn').addEventListener('click', () => {
+            const text = document.getElementById('tempPassword').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyTempBtn');
+                btn.textContent = 'Tersalin!';
+                setTimeout(() => { btn.textContent = 'Salin Password'; }, 1500);
+            }).catch(() => alert('Password: ' + text));
+        });
+        document.getElementById('resetModal').addEventListener('click', (e) => {
+            if (e.target.id === 'resetModal') {
+                document.getElementById('resetModal').classList.remove('show');
+            }
+        });
 
         async function banUser(id) {
             if (!confirm('Banned akun mitra ini?')) return;
             const { error } = await supabase.from('profiles').update({ is_banned: true }).eq('id', id);
             if (error) { alert('Gagal banned: ' + error.message); return; }
             loadUsers();
+            loadStats();
         }
 
         async function restoreUser(id) {
@@ -433,6 +557,7 @@
             const { error } = await supabase.from('profiles').update({ is_banned: false }).eq('id', id);
             if (error) { alert('Gagal pulihkan: ' + error.message); return; }
             loadUsers();
+            loadStats();
         }
 
         // ============ PENGATURAN ============
