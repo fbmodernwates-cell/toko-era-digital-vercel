@@ -52,11 +52,15 @@
     <script src="js/supabase-config.js"></script>
     <script>
         if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-            document.getElementById('alert').textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
-            document.getElementById('alert').className = 'alert error show';
-            document.getElementById('submitBtn').disabled = true;
+            const alertEl = document.getElementById('alert');
+            if (alertEl) {
+                alertEl.textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
+                alertEl.className = 'alert error show';
+            }
+            const btn = document.getElementById('submitBtn');
+            if (btn) btn.disabled = true;
         }
-        
+
         const form = document.getElementById('loginForm');
         const alertBox = document.getElementById('alert');
         const submitBtn = document.getElementById('submitBtn');
@@ -66,13 +70,9 @@
             alertBox.className = 'alert ' + type + ' show';
         }
 
-        function hideAlert() {
-            alertBox.className = 'alert';
-        }
-
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            hideAlert();
+            showAlert('', '');
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
@@ -81,19 +81,24 @@
 
             try {
                 const { data, error } = await supabase.auth.signInWithPassword({
-                    email: email,
-                    password: password
+                    email,
+                    password
                 });
 
                 if (error) {
-                    showAlert('Email atau password salah!', 'error');
+                    const msg = error.message || '';
+                    let message = 'Email atau password salah!';
+                    if (msg.toLowerCase().includes('confirm') || msg.toLowerCase().includes('verify')) {
+                        message = 'Email belum diverifikasi. Cek inbox email lalu login kembali.';
+                    }
+                    showAlert(message, 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Login';
                     return;
                 }
 
-                const user = data.user;
-                if (!user) {
+                const user = data?.user;
+                if (!user?.id) {
                     showAlert('Gagal mendapatkan data pengguna.', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Login';
@@ -102,20 +107,33 @@
 
                 let profile = null;
                 try {
-                    const res = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
+                    const res = await supabase.from('profiles').select('role, is_banned').eq('id', user.id).maybeSingle();
                     if (res.error) throw res.error;
                     profile = res.data;
-                } catch (e) {
-                    console.error('Profile check failed', e);
+                } catch (err) {
+                    console.error('Profile check failed', err);
+                    showAlert('Gagal memuat profil pengguna.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                    return;
                 }
-                if (profile?.is_banned) {
-                    await supabase.auth.signOut();
+
+                if (!profile) {
+                    showAlert('Profil tidak ditemukan. Hubungi admin.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                    return;
+                }
+
+                if (profile.is_banned) {
+                    await supabase.auth.signOut().catch(() => {});
                     showAlert('Akun Anda dibanned. Hubungi admin.', 'error');
                     submitBtn.disabled = false;
                     submitBtn.textContent = 'Login';
                     return;
                 }
-                const role = user.user_metadata?.role;
+
+                const role = profile.role || 'mitra';
                 if (role === 'admin') {
                     window.location.href = '/admin.html';
                 } else {

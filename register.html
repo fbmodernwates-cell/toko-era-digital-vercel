@@ -87,18 +87,25 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <script>
         if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-            document.getElementById('alert').textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
-            document.getElementById('alert').className = 'alert error show';
+            const alertEl = document.getElementById('alert');
+            if (alertEl) {
+                alertEl.textContent = 'Gagal memuat layanan autentikasi. Periksa koneksi internet atau muat ulang halaman.';
+                alertEl.className = 'alert error show';
+            }
             const btn = document.getElementById('submitBtn');
             if (btn) { btn.disabled = true; btn.textContent = 'Muat ulang halaman'; }
+            const verifyBtn = document.getElementById('verifyBtn');
+            if (verifyBtn) verifyBtn.disabled = true;
         }
-        let verifiedCode = null;
-        let isAdminRegister = false;
+
         const alertBox = document.getElementById('alert');
+        const submitBtn = document.getElementById('submitBtn');
+        const verifyBtn = document.getElementById('verifyBtn');
+
+        let verifiedCode = null;
 
         function showAlert(msg, type) {
             alertBox.textContent = msg;
@@ -112,156 +119,177 @@
             document.getElementById('dot2').className = 'step-dot' + (n >= 2 ? ' active' : '');
         }
 
-        // STEP 1: Verify Code
-        document.getElementById('verifyBtn').addEventListener('click', async () => {
+        verifyBtn.addEventListener('click', async () => {
             const code = document.getElementById('code').value.trim().toUpperCase();
-            if (!code) { showAlert('Masukkan kode unik!', 'error'); return; }
-
-            const btn = document.getElementById('verifyBtn');
-            btn.disabled = true;
-            btn.textContent = 'Verifikasi...';
-
-            const { data, error } = await supabase
-                .from('registration_codes')
-                .select('*')
-                .eq('code', code)
-                .eq('is_used', false)
-                .maybeSingle();
-
-            if (error || !data) {
-                showAlert('Kode tidak valid atau sudah terpakai!', 'error');
-                btn.disabled = false;
-                btn.textContent = 'Verifikasi Kode';
+            if (!code) {
+                showAlert('Masukkan kode unik!', 'error');
                 return;
             }
 
-            if (data.expires_at && new Date(data.expires_at) < new Date()) {
-                showAlert('Kode sudah kedaluwarsa!', 'error');
-                btn.disabled = false;
-                btn.textContent = 'Verifikasi Kode';
-                return;
+            verifyBtn.disabled = true;
+            verifyBtn.textContent = 'Verifikasi...';
+            showAlert('', '');
+
+            try {
+                const { data, error } = await supabase
+                    .from('registration_codes')
+                    .select('*')
+                    .eq('code', code)
+                    .eq('is_used', false)
+                    .maybeSingle();
+
+                if (error) {
+                    showAlert('Gagal memeriksa kode: ' + error.message, 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verifikasi Kode';
+                    return;
+                }
+
+                if (!data) {
+                    showAlert('Kode tidak valid atau sudah terpakai!', 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verifikasi Kode';
+                    return;
+                }
+
+                if (data.expires_at && new Date(data.expires_at) < new Date()) {
+                    showAlert('Kode sudah kedaluwarsa!', 'error');
+                    verifyBtn.disabled = false;
+                    verifyBtn.textContent = 'Verifikasi Kode';
+                    return;
+                }
+
+                verifiedCode = data;
+                document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
+                goToStep(2);
+            } catch (err) {
+                console.error('Verify code error', err);
+                showAlert('Terjadi kesalahan saat verifikasi kode.', 'error');
+            } finally {
+                verifyBtn.disabled = false;
+                verifyBtn.textContent = 'Verifikasi Kode';
             }
-            // Default: no expiry if expires_at is null
-
-            verifiedCode = data;
-            document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
-            goToStep(2);
-            btn.disabled = false;
-            btn.textContent = 'Verifikasi Kode';
         });
 
-        // Fallback: admin secret code always valid for registration
-        document.getElementById('verifyBtn').addEventListener('click', async () => {
-            const code = document.getElementById('code').value.trim().toUpperCase();
-            if (!code || code === verifiedCode?.code) return;
-            const ADMIN_SECRET = 'ADMIN123';
-            if (code !== ADMIN_SECRET) return;
-            const btn = document.getElementById('verifyBtn');
-            btn.disabled = true;
-            btn.textContent = 'Verifikasi...';
-            verifiedCode = { id: 'admin-secret', code: ADMIN_SECRET, expires_at: null };
-            isAdminRegister = true;
-            document.getElementById('codeInfo').textContent = 'Kode admin valid: ' + ADMIN_SECRET;
-            goToStep(2);
-            btn.disabled = false;
-            btn.textContent = 'Verifikasi Kode';
-        });
-
-        // STEP 2: Register
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            showAlert('', '');
+
             const name = document.getElementById('name').value.trim();
             const phone = document.getElementById('phone').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
 
+            if (!name || !phone || !email || !password || !confirmPassword) {
+                showAlert('Semua field wajib diisi.', 'error');
+                return;
+            }
+
             if (password !== confirmPassword) {
                 showAlert('Password tidak cocok!', 'error');
                 return;
             }
 
-            const btn = document.getElementById('submitBtn');
-            btn.disabled = true;
-            btn.textContent = 'Mendaftarkan...';
+            if (!verifiedCode) {
+                showAlert('Verifikasi kode terlebih dahulu.', 'error');
+                return;
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Mendaftarkan...';
 
             try {
-                // 1. Daftar akun
-                const metadata = { full_name: name, phone: phone };
-                if (isAdminRegister) metadata.role = 'admin';
-
                 const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: email,
-                    password: password,
-                    options: { data: metadata, email_confirm: false }
+                    email,
+                    password,
+                    options: {
+                        data: {
+                            full_name: name,
+                            phone: phone
+                        }
+                    }
                 });
 
                 if (authError) {
                     const msg = authError.message || '';
                     let message = 'Gagal daftar: ' + msg;
                     if (msg.includes('over_email_send_rate_limit')) {
-                        message = 'Terlalu banyak percobaan daftar. Tunggu beberapa saat.';
+                        message = 'Terlalu banyak percobaan daftar. Tunggu beberapa saat atau cek Email Confirmation di Supabase Dashboard.';
                     } else if (msg.includes('email_address_invalid')) {
                         message = 'Format email tidak valid. Coba email lain.';
                     } else if (msg.includes('User already registered')) {
                         message = 'Email ini sudah terdaftar. Coba login.';
+                    } else if (msg.toLowerCase().includes('email') && msg.toLowerCase().includes('confirm')) {
+                        message = 'Email confirmation aktif. Cek inbox email untuk verifikasi, lalu login.';
                     }
                     showAlert(message, 'error');
-                    btn.disabled = false;
-                    btn.textContent = 'Daftar Sekarang';
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Daftar Sekarang';
+                    return;
+                }
+
+                if (!authData?.user?.id) {
+                    showAlert('Gagal membuat akun. Coba lagi.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Daftar Sekarang';
                     return;
                 }
 
                 const userId = authData.user.id;
 
-                // 2. Tandai kode terpakai (hanya jika kode ada di database, skip admin secret)
-                if (verifiedCode.id !== 'admin-secret') {
-                    await supabase.from('registration_codes').update({
-                        is_used: true,
-                        used_by: userId
-                    }).eq('id', verifiedCode.id);
-                }
-
-                // 3. Buat toko
-                await supabase.from('stores').insert({
+                // Buat store
+                const { error: storeError } = await supabase.from('stores').insert({
                     user_id: userId,
                     store_name: name + "'s Store"
                 });
-
-                // 4. Jika register admin, pastikan role admin tersimpan di profile
-                if (isAdminRegister) {
-                    await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
+                if (storeError) {
+                    console.error('Insert store failed', storeError);
                 }
 
-                showAlert('Berhasil! Mengalihkan...', 'success');
+                // Tandai kode terpakai setelah user dan store berhasil dibuat
+                const { error: codeError } = await supabase.from('registration_codes').update({
+                    is_used: true,
+                    used_by: userId
+                }).eq('id', verifiedCode.id);
+                if (codeError) {
+                    console.error('Update registration code failed', codeError);
+                }
 
-                // Login otomatis setelah daftar untuk memastikan session aktif
+                // Ambil role dari profiles sebagai sumber yang benar
+                let role = 'mitra';
                 try {
-                    const { data: loginData, error: loginError } = await supabase.auth.signInWithPassword({
-                        email,
-                        password
-                    });
-                    if (loginError || !loginData.user) {
-                        setTimeout(() => { window.location.href = '/login.html'; }, 1000);
-                        return;
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('role')
+                        .eq('id', userId)
+                        .maybeSingle();
+
+                    if (profileError) {
+                        console.error('Load profile failed', profileError);
+                    } else if (profile?.role) {
+                        role = profile.role;
                     }
-                    const userId = loginData.user.id;
-                    if (isAdminRegister) {
-                        await supabase.from('profiles').update({ role: 'admin' }).eq('id', userId);
-                    }
-                    const role = loginData.user.user_metadata?.role;
+                } catch (err) {
+                    console.error('Profile fetch error', err);
+                }
+
+                if (authData.session) {
+                    showAlert('Berhasil! Mengalihkan...', 'success');
                     setTimeout(() => {
                         window.location.href = role === 'admin' ? '/admin.html' : '/toko.html';
                     }, 1000);
-                } catch (e) {
-                    console.error('Auto-login failed', e);
-                    setTimeout(() => { window.location.href = '/login.html'; }, 1000);
+                } else {
+                    showAlert('Pendaftaran berhasil. Silakan login untuk melanjutkan.', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/login.html';
+                    }, 1500);
                 }
             } catch (err) {
                 console.error('Register submit error', err);
                 showAlert('Terjadi kesalahan: ' + (err.message || err), 'error');
-                btn.disabled = false;
-                btn.textContent = 'Daftar Sekarang';
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Daftar Sekarang';
             }
         });
     </script>
