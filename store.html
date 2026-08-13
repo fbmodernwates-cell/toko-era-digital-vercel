@@ -130,19 +130,40 @@
     </div>
 
     <script>
-        // Parse user ID from URL: ?u=USERID or /s/USERID
-        function getUserId() {
+        // Resolve URL → userId:
+        //   ?u=USERID        → query string (legacy)
+        //   /s/USERID         → UUID format
+        //   /t/SLUG           → custom short slug (e.g. /t/budi-berkah)
+        //     - If slug matches, fetch stores.slug → return user_id
+        //     - If slug not found, treat as invalid → show error
+
+        let userId = null;       // resolved at runtime
+        let isSlugMode = false;  // true if URL is /t/SLUG
+        let pendingSlug = null;  // slug to resolve via DB
+
+        function parseUrl() {
             const params = new URLSearchParams(window.location.search);
             const u = params.get('u');
-            if (u) return u;
-            // Try path: /s/USERID
-            const m = window.location.pathname.match(/\/s\/([^/]+)/);
-            if (m) return decodeURIComponent(m[1]);
-            return null;
+            if (u) return { userId: u, slug: null };
+
+            const path = window.location.pathname;
+            // /s/USERID (UUID format)
+            const sMatch = path.match(/\/s\/([^/]+)/);
+            if (sMatch) return { userId: decodeURIComponent(sMatch[1]), slug: null };
+
+            // /t/SLUG (custom short slug)
+            const tMatch = path.match(/\/t\/([^/]+)/);
+            if (tMatch) return { userId: null, slug: decodeURIComponent(tMatch[1]) };
+
+            return { userId: null, slug: null };
         }
 
-        const userId = getUserId();
-        if (!userId) {
+        const parsed = parseUrl();
+        userId = parsed.userId;
+        isSlugMode = !!parsed.slug;
+        pendingSlug = parsed.slug;
+
+        if (!userId && !pendingSlug) {
             document.getElementById('loading').style.display = 'none';
             document.getElementById('errorBox').style.display = 'block';
             document.getElementById('errorTitle').textContent = 'URL tidak valid';
@@ -164,17 +185,41 @@
 
         async function init() {
             try {
+                // Use the actual client instance (window.supabaseClient, exposed by js/supabase-config.js)
+                // window.supabase is the SDK module, not the client — using it would fail with
+                // 'supabase.from is not a function'.
+                const client = window.supabaseClient || supabase;
+                if (!client || typeof client.from !== 'function') {
+                    throw new Error('Supabase client belum siap');
+                }
+
+                // If URL is /t/SLUG, resolve slug → user_id first
+                if (isSlugMode && pendingSlug) {
+                    const { data: storeBySlug, error: slugErr } = await client
+                        .from('stores')
+                        .select('user_id, store_name')
+                        .eq('slug', pendingSlug)
+                        .eq('is_active', true)
+                        .maybeSingle();
+
+                    if (slugErr || !storeBySlug) {
+                        showError('Toko tidak ditemukan', 'Slug "' + escapeHtml(pendingSlug) + '" tidak terdaftar atau toko belum aktif.');
+                        return;
+                    }
+                    userId = storeBySlug.user_id;
+                }
+
                 // Load store profile (public read via RLS)
-                const { data: store, error: storeErr } = await supabase
+                const { data: store, error: storeErr } = await client
                     .from('stores')
-                    .select('store_name, description, user_id')
+                    .select('store_name, description, user_id, slug')
                     .eq('user_id', userId)
                     .eq('is_active', true)
                     .maybeSingle();
 
                 if (storeErr || !store) {
                     // Try loading profile to get name even if store not set
-                    const { data: profile } = await supabase
+                    const { data: profile } = await client
                         .from('profiles')
                         .select('full_name, phone, email')
                         .eq('id', userId)
@@ -190,11 +235,12 @@
                         store_name: profile.full_name + "'s Store",
                         description: 'Toko ' + (profile.full_name || 'Sobat Era Digital'),
                         user_id: userId,
-                        phone: profile.phone
+                        phone: profile.phone,
+                        slug: null
                     });
                 } else {
                     // Load profile to get phone (for WhatsApp contact)
-                    const { data: profile } = await supabase
+                    const { data: profile } = await client
                         .from('profiles')
                         .select('full_name, phone')
                         .eq('id', userId)
@@ -242,8 +288,10 @@
             }
             metaEl.innerHTML = metaHtml;
 
-            // Build public URL
-            const publicUrl = window.location.origin + '/s/' + userId;
+            // Build public URL — prefer slug (/t/SLUG) if set, else /s/USERID
+            const publicUrl = store.slug
+                ? window.location.origin + '/t/' + encodeURIComponent(store.slug)
+                : window.location.origin + '/s/' + userId;
             window.__publicUrl = publicUrl;
 
             // Copy link button
@@ -266,7 +314,8 @@
         }
 
         async function loadMyProducts() {
-            const { data, error } = await supabase
+            const client = window.supabaseClient || supabase;
+            const { data, error } = await client
                 .from('user_products')
                 .select('*')
                 .eq('user_id', userId)
@@ -283,7 +332,8 @@
         }
 
         async function loadAdminProducts() {
-            const { data, error } = await supabase
+            const client = window.supabaseClient || supabase;
+            const { data, error } = await client
                 .from('admin_products')
                 .select('*')
                 .eq('is_active', true)
@@ -336,7 +386,8 @@
         // Contact seller via WhatsApp (uses store owner's phone)
         async function contactSeller(productName, price) {
             try {
-                const { data: profile } = await supabase
+                const client = window.supabaseClient || supabase;
+                const { data: profile } = await client
                     .from('profiles')
                     .select('phone, full_name')
                     .eq('id', userId)

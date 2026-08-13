@@ -173,6 +173,7 @@ CREATE TABLE IF NOT EXISTS stores (
   store_name TEXT NOT NULL DEFAULT 'Toko Saya',
   description TEXT,
   is_active BOOLEAN DEFAULT TRUE,
+  slug TEXT UNIQUE,  -- short URL slug, e.g. 'budi-berkah' → /t/budi-berkah
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -186,6 +187,9 @@ DROP POLICY IF EXISTS "Anyone can view active stores" ON stores;
 CREATE POLICY "Anyone can view active stores" ON stores
   FOR SELECT TO anon, authenticated
   USING (is_active = true);
+
+-- Index for fast slug lookup
+CREATE INDEX IF NOT EXISTS stores_slug_idx ON stores(slug) WHERE slug IS NOT NULL;
 
 -- ============================================
 -- RPC FUNCTION: get_sobat_count()

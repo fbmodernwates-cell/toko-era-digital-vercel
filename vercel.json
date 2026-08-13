@@ -8,6 +8,7 @@
     { "source": "/api-docs",          "destination": "/api-docs.html" },
     { "source": "/store",             "destination": "/store.html" },
     { "source": "/s/:userId",         "destination": "/store.html" },
+    { "source": "/t/:slug",           "destination": "/store.html" },
     { "source": "/forgot-password",   "destination": "/forgot-password.html" },
     { "source": "/reset-password",    "destination": "/reset-password.html" }
   ],

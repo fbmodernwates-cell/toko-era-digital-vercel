@@ -181,6 +181,18 @@
                 <input type="text" id="storeName" placeholder="Contoh: Toko Sejahtera" required>
             </div>
             <div class="form-group">
+                <label>URL Singkat Toko (slug)</label>
+                <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
+                    <code style="font-size:.78rem;color:var(--text-muted);white-space:nowrap">/t/</code>
+                    <input type="text" id="storeSlug" placeholder="contoh: toko-budi" maxlength="40" pattern="[a-z0-9-]+" style="flex:1;min-width:120px;text-transform:lowercase">
+                </div>
+                <small style="display:block;color:var(--text-muted);font-size:.72rem;margin-top:4px">
+                    Hanya huruf kecil, angka, dan tanda hubung. Contoh: <code>toko-budi</code> → link <code>/t/toko-budi</code>. Kosongkan jika ingin pakai ID panjang.
+                </small>
+                <div id="slugPreview" style="margin-top:6px;font-size:.78rem;color:var(--primary-dark);font-weight:600"></div>
+                <div id="slugError" style="margin-top:4px;font-size:.72rem;color:var(--error);display:none"></div>
+            </div>
+            <div class="form-group">
                 <label>Deskripsi</label>
                 <textarea id="storeDesc" placeholder="Deskripsi singkat toko..."></textarea>
             </div>
@@ -348,14 +360,70 @@
                 </div>`;
                 document.getElementById('storeName').value = data.store_name || '';
                 document.getElementById('storeDesc').value = data.description || '';
+                document.getElementById('storeSlug').value = data.slug || '';
+                updateSlugPreview();
             }
             // Always setup share link (works even if store profile not set yet)
-            setupShareLink();
+            setupShareLink(data && data.slug);
         }
 
+        // ============ SLUG PREVIEW & VALIDATION ============
+        function updateSlugPreview() {
+            const slug = document.getElementById('storeSlug').value.trim().toLowerCase();
+            const preview = document.getElementById('slugPreview');
+            const errEl = document.getElementById('slugError');
+            errEl.style.display = 'none';
+            errEl.textContent = '';
+
+            if (!slug) {
+                preview.textContent = 'Link toko: /s/' + currentUser.id.substring(0, 8) + '... (URL panjang)';
+                return;
+            }
+            if (!/^[a-z0-9-]+$/.test(slug)) {
+                preview.textContent = '';
+                errEl.textContent = 'Slug hanya boleh huruf kecil, angka, dan tanda hubung.';
+                errEl.style.display = 'block';
+                return;
+            }
+            if (slug.length < 3) {
+                preview.textContent = '';
+                errEl.textContent = 'Slug minimal 3 karakter.';
+                errEl.style.display = 'block';
+                return;
+            }
+            preview.textContent = '✓ Link toko: /t/' + slug;
+        }
+        document.getElementById('storeSlug').addEventListener('input', updateSlugPreview);
+
+        // Debounced slug uniqueness check
+        let slugCheckTimer = null;
+        document.getElementById('storeSlug').addEventListener('input', () => {
+            clearTimeout(slugCheckTimer);
+            slugCheckTimer = setTimeout(async () => {
+                const slug = document.getElementById('storeSlug').value.trim().toLowerCase();
+                const errEl = document.getElementById('slugError');
+                if (!slug || slug.length < 3 || !/^[a-z0-9-]+$/.test(slug)) return;
+                try {
+                    const { data } = await supabase.from('stores')
+                        .select('user_id')
+                        .eq('slug', slug)
+                        .maybeSingle();
+                    if (data && data.user_id !== currentUser.id) {
+                        errEl.textContent = 'Slug "' + slug + '" sudah dipakai toko lain. Pilih slug berbeda.';
+                        errEl.style.display = 'block';
+                    }
+                } catch (e) { /* ignore — DB will reject on save */ }
+            }, 600);
+        });
+
         // ============ SHARE LINK ============
-        function setupShareLink() {
-            const publicUrl = window.location.origin + '/s/' + currentUser.id;
+        function setupShareLink(existingSlug) {
+            // Build public URL — prefer slug from DB, else from input field, else long URL
+            const inputSlug = document.getElementById('storeSlug') ? document.getElementById('storeSlug').value.trim().toLowerCase() : '';
+            const slug = existingSlug || inputSlug;
+            const publicUrl = slug
+                ? window.location.origin + '/t/' + encodeURIComponent(slug)
+                : window.location.origin + '/s/' + currentUser.id;
             document.getElementById('storePublicUrl').textContent = publicUrl;
 
             document.getElementById('copyStoreLinkBtn').addEventListener('click', () => {
@@ -395,13 +463,38 @@
             e.preventDefault();
             const name = document.getElementById('storeName').value.trim();
             const description = document.getElementById('storeDesc').value.trim();
+            let slug = document.getElementById('storeSlug').value.trim().toLowerCase();
+
+            // Validate slug if provided
+            if (slug) {
+                if (!/^[a-z0-9-]+$/.test(slug)) {
+                    alert('Slug hanya boleh huruf kecil, angka, dan tanda hubung.');
+                    return;
+                }
+                if (slug.length < 3) {
+                    alert('Slug minimal 3 karakter.');
+                    return;
+                }
+            } else {
+                slug = null; // allow unset (fall back to long URL)
+            }
+
             const { error } = await supabase.from('stores').upsert({
                 user_id: currentUser.id,
                 store_name: name || 'Toko Saya',
                 description: description || null,
+                slug: slug,
                 is_active: true
             }, { onConflict: 'user_id' });
-            if (error) { alert('Gagal: ' + error.message); return; }
+            if (error) {
+                if (error.message && error.message.includes('stores_slug_key')) {
+                    alert('Slug "' + slug + '" sudah dipakai toko lain. Pilih slug berbeda.');
+                } else {
+                    alert('Gagal: ' + error.message);
+                }
+                return;
+            }
+            // Update share link + slug preview after save
             loadStore();
         });
 
