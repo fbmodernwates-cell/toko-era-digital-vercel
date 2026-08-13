@@ -65,7 +65,7 @@ Lihat dokumentasi lengkap di `/api-docs` setelah deploy, atau baca ringkasan di 
 
 | Method | Path     | Description                                                    |
 |--------|----------|----------------------------------------------------------------|
-| GET    | `/api/me`| Profil user yang sedang login + store info (jika mitra)        |
+| GET    | `/api/me`| Profil user yang sedang login + store info (jika Sobat Era Digital)        |
 
 ### Admin only (`profiles.role = 'admin'`)
 

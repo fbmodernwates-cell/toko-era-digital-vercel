@@ -115,12 +115,12 @@
     <div class="container" id="adminContainer" style="display:none">
         <div class="header">
             <h1>Dashboard Admin</h1>
-            <p>Kelola kode pendaftaran, produk etalase, dan mitra</p>
+            <p>Kelola kode pendaftaran, produk etalase, dan Sobat Era Digital</p>
         </div>
 
         <!-- STATS GRID -->
         <div class="stats-grid" id="statsGrid">
-            <div class="stat-card"><div class="label">Total Mitra</div><div class="value" id="statUsers">—</div><div class="sub" id="statBanned">—</div></div>
+            <div class="stat-card"><div class="label">Total Sobat</div><div class="value" id="statUsers">—</div><div class="sub" id="statBanned">—</div></div>
             <div class="stat-card"><div class="label">Kode Aktif</div><div class="value" id="statCodesActive">—</div><div class="sub" id="statCodesUsed">—</div></div>
             <div class="stat-card"><div class="label">Produk Aktif</div><div class="value" id="statProductsActive">—</div><div class="sub" id="statProductsTotal">—</div></div>
             <div class="stat-card"><div class="label">Total Toko</div><div class="value" id="statStores">—</div><div class="sub">Stores registered</div></div>
@@ -129,7 +129,7 @@
         <div class="tabs">
             <button class="tab active" data-tab="codes">Kode Pendaftaran</button>
             <button class="tab" data-tab="products">Produk Etalase</button>
-            <button class="tab" data-tab="users">Mitra Terdaftar</button>
+            <button class="tab" data-tab="users">Sobat Era Digital</button>
             <button class="tab" data-tab="settings">Pengaturan</button>
         </div>
 
@@ -221,10 +221,10 @@
             </div>
         </div>
 
-        <!-- TAB: MITRA -->
+        <!-- TAB: SOBAT ERA DIGITAL -->
         <div class="tab-content" id="tab-users">
             <div class="card">
-                <h2>Mitra Terdaftar</h2>
+                <h2>Sobat Era Digital Terdaftar</h2>
                 <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px">
                     Aksi <strong>Reset Password</strong> memanggil endpoint <code>/api/admin/reset-password</code> dengan service role key di server-side.
                 </p>
@@ -381,7 +381,7 @@
             data.forEach(c => {
                 html += '<div class="code">' + c.code + '</div>';
             });
-            html += '<p>Bagikan kode ini kepada calon mitra</p></div>';
+            html += '<p>Bagikan kode ini kepada calon Sobat Era Digital</p></div>';
             codesBox.innerHTML = html;
             loadCodes();
         });
@@ -445,17 +445,17 @@
             loadProducts();
         }
 
-        // ============ MITRA ============
+        // ============ SOBAT ERA DIGITAL ============
         async function loadUsers() {
             const { data: codes } = await supabase.from('registration_codes').select('used_by').not('used_by', 'is', null);
             if (!codes || codes.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada mitra terdaftar</td></tr>';
+                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada Sobat Era Digital terdaftar</td></tr>';
                 return;
             }
             const userIds = [...new Set(codes.map(c => c.used_by))];
             const { data: profiles } = await supabase.from('profiles').select('*').in('id', userIds);
             if (!profiles || profiles.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada mitra</td></tr>';
+                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada Sobat Era Digital</td></tr>';
                 return;
             }
             let html = '';
@@ -545,7 +545,7 @@
         });
 
         async function banUser(id) {
-            if (!confirm('Banned akun mitra ini?')) return;
+            if (!confirm('Banned akun Sobat Era Digital ini?')) return;
             const { error } = await supabase.from('profiles').update({ is_banned: true }).eq('id', id);
             if (error) { alert('Gagal banned: ' + error.message); return; }
             loadUsers();
@@ -553,7 +553,7 @@
         }
 
         async function restoreUser(id) {
-            if (!confirm('Pulihkan akun mitra ini?')) return;
+            if (!confirm('Pulihkan akun Sobat Era Digital ini?')) return;
             const { error } = await supabase.from('profiles').update({ is_banned: false }).eq('id', id);
             if (error) { alert('Gagal pulihkan: ' + error.message); return; }
             loadUsers();
