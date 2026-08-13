@@ -6,8 +6,6 @@
     <title>Toko - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
-    <script src="js/supabase-config.js"></script>
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.10);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
@@ -26,14 +24,10 @@
         .store-actions a, .store-actions button{padding:8px 14px;border-radius:8px;background:rgba(255,255,255,.95);color:var(--primary-dark);font-weight:600;font-size:.82rem;text-decoration:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:6px}
         .store-actions a:hover, .store-actions button:hover{background:#fff;transform:translateY(-1px)}
 
-        /* Container */
         .container{width:100%;max-width:1100px;margin:0 auto;padding:16px 12px 60px}
-
-        /* Section */
         .section-title{font-size:1.05rem;font-weight:700;margin:24px 0 12px;color:var(--text);display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
         .section-title .count{font-size:.78rem;color:var(--text-muted);font-weight:400;background:var(--bg-card);padding:3px 10px;border-radius:12px}
 
-        /* Product Grid */
         .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
         .product-card{background:var(--bg-card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);transition:all .3s;display:flex;flex-direction:column}
         .product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
@@ -53,21 +47,15 @@
         .product-card .out-of-stock{margin-top:8px;padding:8px;border:none;border-radius:8px;background:#E5E7EB;color:var(--text-muted);font-weight:600;font-size:.78rem;width:100%;text-align:center}
 
         .empty{text-align:center;padding:32px 16px;color:var(--text-muted);font-size:.9rem;background:var(--bg-card);border-radius:12px}
-
-        /* Loading state */
         .loading{text-align:center;padding:48px 16px;color:var(--text-muted);font-size:.9rem}
         .spinner{display:inline-block;width:32px;height:32px;border:3px solid var(--primary-light);border-top-color:var(--primary);border-radius:50%;animation:spin 1s linear infinite;margin-bottom:12px}
         @keyframes spin{to{transform:rotate(360deg)}}
 
-        /* Error state */
         .error-box{background:#FEE2E2;color:#DC2626;padding:24px 16px;border-radius:12px;text-align:center;margin:24px 16px;font-size:.9rem}
         .error-box h2{font-size:1.1rem;margin-bottom:8px}
-
-        /* Footer */
         .footer{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:.78rem;border-top:1px solid #E5E7EB;margin-top:32px}
         .footer a{color:var(--primary-dark);text-decoration:none;font-weight:600}
 
-        /* Desktop */
         @media(min-width:768px){
             .store-hero{padding:48px 24px 32px}
             .store-avatar{width:96px;height:96px;font-size:2.6rem}
@@ -92,7 +80,6 @@
     </div>
 
     <div id="storeContent" style="display:none">
-        <!-- Store Hero -->
         <div class="store-hero">
             <div class="store-avatar" id="storeAvatar">T</div>
             <h1 id="storeName">Toko Saya</h1>
@@ -105,7 +92,6 @@
         </div>
 
         <div class="container">
-            <!-- Produk Saya (milik toko ini) -->
             <div class="section-title">
                 <span>🛍️ Produk Toko</span>
                 <span class="count" id="myCount">0 produk</span>
@@ -114,7 +100,6 @@
                 <div class="empty" style="grid-column:1/-1">Belum ada produk di toko ini</div>
             </div>
 
-            <!-- Produk Etalase (admin — bisa Sobat jual juga) -->
             <div class="section-title">
                 <span>📦 Produk Etalase Pusat</span>
                 <span class="count" id="adminCount">0 produk</span>
@@ -130,16 +115,37 @@
     </div>
 
     <script>
-        // Resolve URL → userId:
-        //   ?u=USERID        → query string (legacy)
-        //   /s/USERID         → UUID format
-        //   /t/SLUG           → custom short slug (e.g. /t/budi-berkah)
-        //     - If slug matches, fetch stores.slug → return user_id
-        //     - If slug not found, treat as invalid → show error
+        // ============================================
+        // KONFIGURASI — pakai native fetch, TIDAK butuh Supabase SDK
+        // ============================================
+        const SUPABASE_URL = 'https://msqgmtvbxzhsbleraysu.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_k3zaTPaPEUr_yLeE-gIJgw_egDCeyFp';
 
-        let userId = null;       // resolved at runtime
-        let isSlugMode = false;  // true if URL is /t/SLUG
-        let pendingSlug = null;  // slug to resolve via DB
+        // Helper: panggil Supabase REST API dengan native fetch
+        async function sbGet(path, params) {
+            const url = new URL(SUPABASE_URL + '/rest/v1/' + path);
+            if (params) {
+                Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+            }
+            const res = await fetch(url, {
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY
+                }
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error('Supabase ' + res.status + ': ' + text.slice(0, 200));
+            }
+            return await res.json();
+        }
+
+        // ============================================
+        // Parse URL → userId atau slug
+        // ============================================
+        let userId = null;
+        let isSlugMode = false;
+        let pendingSlug = null;
 
         function parseUrl() {
             const params = new URLSearchParams(window.location.search);
@@ -164,10 +170,7 @@
         pendingSlug = parsed.slug;
 
         if (!userId && !pendingSlug) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('errorBox').style.display = 'block';
-            document.getElementById('errorTitle').textContent = 'URL tidak valid';
-            document.getElementById('errorMessage').textContent = 'Link toko tidak lengkap. Pastikan menggunakan link yang benar.';
+            showError('URL tidak valid', 'Link toko tidak lengkap. Pastikan menggunakan link yang benar.');
         } else {
             init();
         }
@@ -183,69 +186,48 @@
             return 'Rp ' + Number(n || 0).toLocaleString('id');
         }
 
+        function showError(title, msg) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('errorBox').style.display = 'block';
+            document.getElementById('errorTitle').textContent = title;
+            document.getElementById('errorMessage').textContent = msg;
+        }
+
+        // ============================================
+        // INIT — load toko & produk
+        // ============================================
         async function init() {
             try {
-                // Use the actual client instance (window.supabaseClient, exposed by js/supabase-config.js)
-                // window.supabase is the SDK module, not the client — using it would fail with
-                // 'supabase.from is not a function'.
-                const client = window.supabaseClient || supabase;
-                if (!client || typeof client.from !== 'function') {
-                    throw new Error('Supabase client belum siap');
-                }
-
-                // If URL is /t/SLUG, resolve slug → user_id first
+                // Jika URL /t/SLUG, resolve slug → user_id dulu
                 if (isSlugMode && pendingSlug) {
-                    const { data: storeBySlug, error: slugErr } = await client
-                        .from('stores')
-                        .select('user_id, store_name')
-                        .eq('slug', pendingSlug)
-                        .eq('is_active', true)
-                        .maybeSingle();
-
-                    if (slugErr || !storeBySlug) {
+                    const slugRows = await sbGet('stores', {
+                        select: 'user_id,store_name,description,slug',
+                        slug: 'eq.' + pendingSlug,
+                        is_active: 'eq.true',
+                        limit: '1'
+                    });
+                    if (!slugRows || slugRows.length === 0) {
                         showError('Toko tidak ditemukan', 'Slug "' + escapeHtml(pendingSlug) + '" tidak terdaftar atau toko belum aktif.');
                         return;
                     }
-                    userId = storeBySlug.user_id;
-                }
-
-                // Load store profile (public read via RLS)
-                const { data: store, error: storeErr } = await client
-                    .from('stores')
-                    .select('store_name, description, user_id, slug')
-                    .eq('user_id', userId)
-                    .eq('is_active', true)
-                    .maybeSingle();
-
-                if (storeErr || !store) {
-                    // Try loading profile to get name even if store not set
-                    const { data: profile } = await client
-                        .from('profiles')
-                        .select('full_name, phone, email')
-                        .eq('id', userId)
-                        .maybeSingle();
-
-                    if (!profile) {
-                        showError('Toko tidak ditemukan', 'Pengguna tidak terdaftar atau toko belum aktif.');
-                        return;
-                    }
-
-                    // Show profile as fallback (toko belum setup)
-                    renderStore({
-                        store_name: profile.full_name + "'s Store",
-                        description: 'Toko ' + (profile.full_name || 'Sobat Era Digital'),
-                        user_id: userId,
-                        phone: profile.phone,
-                        slug: null
-                    });
+                    userId = slugRows[0].user_id;
+                    // Render langsung dari data slug
+                    await loadProfileAndRender(slugRows[0]);
                 } else {
-                    // Load profile to get phone (for WhatsApp contact)
-                    const { data: profile } = await client
-                        .from('profiles')
-                        .select('full_name, phone')
-                        .eq('id', userId)
-                        .maybeSingle();
-                    renderStore({ ...store, phone: profile?.phone, full_name: profile?.full_name });
+                    // Cari store by user_id
+                    const storeRows = await sbGet('stores', {
+                        select: 'user_id,store_name,description,slug',
+                        user_id: 'eq.' + userId,
+                        is_active: 'eq.true',
+                        limit: '1'
+                    });
+
+                    if (storeRows && storeRows.length > 0) {
+                        await loadProfileAndRender(storeRows[0]);
+                    } else {
+                        // Store belum setup — load profile sebagai fallback
+                        await loadProfileOnly(userId);
+                    }
                 }
 
                 loadMyProducts();
@@ -256,11 +238,43 @@
             }
         }
 
-        function showError(title, msg) {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('errorBox').style.display = 'block';
-            document.getElementById('errorTitle').textContent = title;
-            document.getElementById('errorMessage').textContent = msg;
+        async function loadProfileAndRender(store) {
+            // Load profile untuk dapat phone (untuk WhatsApp)
+            let profile = null;
+            try {
+                const profiles = await sbGet('profiles', {
+                    select: 'full_name,phone',
+                    id: 'eq.' + userId,
+                    limit: '1'
+                });
+                if (profiles && profiles.length > 0) profile = profiles[0];
+            } catch (e) { /* ignore — phone optional */ }
+
+            renderStore({ ...store, phone: profile?.phone, full_name: profile?.full_name });
+        }
+
+        async function loadProfileOnly(uid) {
+            try {
+                const profiles = await sbGet('profiles', {
+                    select: 'full_name,phone,email',
+                    id: 'eq.' + uid,
+                    limit: '1'
+                });
+                if (!profiles || profiles.length === 0) {
+                    showError('Toko tidak ditemukan', 'Pengguna tidak terdaftar atau toko belum aktif.');
+                    return;
+                }
+                const p = profiles[0];
+                renderStore({
+                    store_name: (p.full_name || 'Sobat') + "'s Store",
+                    description: 'Toko ' + (p.full_name || 'Sobat Era Digital'),
+                    user_id: uid,
+                    phone: p.phone,
+                    slug: null
+                });
+            } catch (err) {
+                showError('Toko tidak ditemukan', 'Pengguna tidak terdaftar atau toko belum aktif.');
+            }
         }
 
         function renderStore(store) {
@@ -272,29 +286,24 @@
             const phone = store.phone || '';
             const fullName = store.full_name || name;
 
-            // Avatar = first letter of store name
             document.getElementById('storeAvatar').textContent = name.charAt(0).toUpperCase();
             document.getElementById('storeName').textContent = name;
             document.getElementById('storeDesc').textContent = desc;
 
-            // Meta chips
             const metaEl = document.getElementById('storeMeta');
             let metaHtml = '<span class="chip">👤 ' + escapeHtml(fullName) + '</span>';
             if (phone) {
                 const cleanPhone = phone.replace(/[^0-9]/g, '').replace(/^0/, '62');
                 metaHtml += '<span class="chip">📱 ' + escapeHtml(phone) + '</span>';
-                // WhatsApp contact
                 metaHtml += '<a class="chip" href="https://wa.me/' + cleanPhone + '" target="_blank" style="background:#10B981;color:#fff;text-decoration:none">💬 Hubungi</a>';
             }
             metaEl.innerHTML = metaHtml;
 
-            // Build public URL — prefer slug (/t/SLUG) if set, else /s/USERID
             const publicUrl = store.slug
                 ? window.location.origin + '/t/' + encodeURIComponent(store.slug)
                 : window.location.origin + '/s/' + userId;
             window.__publicUrl = publicUrl;
 
-            // Copy link button
             document.getElementById('copyLinkBtn').addEventListener('click', () => {
                 navigator.clipboard.writeText(publicUrl).then(() => {
                     const btn = document.getElementById('copyLinkBtn');
@@ -306,7 +315,6 @@
                 });
             });
 
-            // WhatsApp share button
             const waText = encodeURIComponent('Halo! Kunjungi toko online saya: ' + name + '\n' + publicUrl);
             document.getElementById('waShareBtn').href = 'https://wa.me/?text=' + waText;
 
@@ -314,39 +322,45 @@
         }
 
         async function loadMyProducts() {
-            const client = window.supabaseClient || supabase;
-            const { data, error } = await client
-                .from('user_products')
-                .select('*')
-                .eq('user_id', userId)
-                .order('created_at', { ascending: false });
-
-            const container = document.getElementById('myProducts');
-            if (error || !data || data.length === 0) {
-                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk di toko ini. Sobat belum menambahkan produk.</div>';
-                document.getElementById('myCount').textContent = '0 produk';
-                return;
+            try {
+                const data = await sbGet('user_products', {
+                    select: '*',
+                    user_id: 'eq.' + userId,
+                    order: 'created_at.desc'
+                });
+                const container = document.getElementById('myProducts');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk di toko ini. Sobat belum menambahkan produk.</div>';
+                    document.getElementById('myCount').textContent = '0 produk';
+                    return;
+                }
+                document.getElementById('myCount').textContent = data.length + ' produk';
+                container.innerHTML = data.map(p => renderProductCard(p, 'user')).join('');
+            } catch (err) {
+                console.warn('loadMyProducts error', err);
+                document.getElementById('myProducts').innerHTML = '<div class="empty" style="grid-column:1/-1">Gagal memuat produk toko.</div>';
             }
-            document.getElementById('myCount').textContent = data.length + ' produk';
-            container.innerHTML = data.map(p => renderProductCard(p, 'user')).join('');
         }
 
         async function loadAdminProducts() {
-            const client = window.supabaseClient || supabase;
-            const { data, error } = await client
-                .from('admin_products')
-                .select('*')
-                .eq('is_active', true)
-                .order('created_at', { ascending: false });
-
-            const container = document.getElementById('adminProducts');
-            if (error || !data || data.length === 0) {
-                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk etalase</div>';
-                document.getElementById('adminCount').textContent = '0 produk';
-                return;
+            try {
+                const data = await sbGet('admin_products', {
+                    select: '*',
+                    is_active: 'eq.true',
+                    order: 'created_at.desc'
+                });
+                const container = document.getElementById('adminProducts');
+                if (!data || data.length === 0) {
+                    container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk etalase</div>';
+                    document.getElementById('adminCount').textContent = '0 produk';
+                    return;
+                }
+                document.getElementById('adminCount').textContent = data.length + ' produk';
+                container.innerHTML = data.map(p => renderProductCard(p, 'admin')).join('');
+            } catch (err) {
+                console.warn('loadAdminProducts error', err);
+                document.getElementById('adminProducts').innerHTML = '<div class="empty" style="grid-column:1/-1">Gagal memuat produk etalase.</div>';
             }
-            document.getElementById('adminCount').textContent = data.length + ' produk';
-            container.innerHTML = data.map(p => renderProductCard(p, 'admin')).join('');
         }
 
         function renderProductCard(p, type) {
@@ -383,15 +397,15 @@
                 '</div></div>';
         }
 
-        // Contact seller via WhatsApp (uses store owner's phone)
+        // Contact seller via WhatsApp — load phone from profiles
         async function contactSeller(productName, price) {
             try {
-                const client = window.supabaseClient || supabase;
-                const { data: profile } = await client
-                    .from('profiles')
-                    .select('phone, full_name')
-                    .eq('id', userId)
-                    .maybeSingle();
+                const profiles = await sbGet('profiles', {
+                    select: 'phone,full_name',
+                    id: 'eq.' + userId,
+                    limit: '1'
+                });
+                const profile = profiles && profiles[0];
                 const phone = profile?.phone || '';
                 if (!phone) {
                     alert('Maaf, kontak penjual belum tersedia. Hubungi admin TOKO ERA DIGITAL.');
