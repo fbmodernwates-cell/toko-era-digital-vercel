@@ -188,5 +188,23 @@ CREATE POLICY "Anyone can view active stores" ON stores
   USING (is_active = true);
 
 -- ============================================
+-- RPC FUNCTION: get_sobat_count()
+-- Public function untuk hitung jumlah Sobat Era Digital (termasuk admin)
+-- Dipakai di homepage untuk counter real-time.
+-- SECURITY DEFINER — bypass RLS, hanya return angka, tidak ekspos data.
+-- ============================================
+
+CREATE OR REPLACE FUNCTION public.get_sobat_count()
+RETURNS INTEGER
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT COUNT(*)::INTEGER FROM profiles;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_sobat_count() TO anon, authenticated;
+
+-- ============================================
 -- SELESAI! Jalankan di Supabase SQL Editor
 -- ============================================

@@ -227,6 +227,8 @@
             .nav { flex-direction: column; gap: 12px; }
         }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
+    <script src="js/supabase-config.js"></script>
 </head>
 <body>
     <nav class="nav">
@@ -243,7 +245,7 @@
         <p>Miliki toko online lengkap siap pakai. Satu kali daftar, langsung aktif seumur hidup. Lebih cepat, lebih hemat, lebih menguntungkan.</p>
         <a href="/register" class="hero-cta">Daftar Sekarang</a>
             <div class="hero-stats">
-            <div class="hero-stat"><strong>1+</strong><span>Sobat Aktif</span></div>
+            <div class="hero-stat"><strong id="sobatCount">…</strong><span>Sobat Era Digital Aktif</span></div>
             <div class="hero-stat"><strong>Seumur Hidup</strong><span>Tanpa Perpanjangan</span></div>
             <div class="hero-stat"><strong>Full Support</strong><span>Bimbingan Sampai Sukses</span></div>
         </div>
@@ -335,5 +337,49 @@
             <a href="#">Syarat Layanan</a>
         </p>
     </footer>
+    <script>
+        // Hitung jumlah Sobat Era Digital yang terdaftar (termasuk admin)
+        // secara real-time via RPC function get_sobat_count().
+        // Function dijalankan sebagai SECURITY DEFINER (bypass RLS)
+        // tapi hanya return angka — tidak ekspos data pribadi.
+        // Fallback ke "1+" jika gagal load.
+
+        async function loadSobatCount() {
+            const el = document.getElementById('sobatCount');
+            if (!el) return;
+            try {
+                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
+                    throw new Error('Supabase SDK belum loaded');
+                }
+                const client = window.supabase;
+
+                // Panggil RPC function (POST, body kosong)
+                const { data, error } = await client
+                    .rpc('get_sobat_count');
+
+                if (error) throw error;
+
+                // data adalah angka integer (count)
+                const count = Number(data) || 0;
+
+                // Tampilkan angka real + "+" — supaya terlihat dinamis
+                // Contoh: 2 → "2+", 25 → "25+", 100 → "100+"
+                if (count > 0) {
+                    el.textContent = count + '+';
+                } else {
+                    el.textContent = '1+';
+                }
+            } catch (err) {
+                console.warn('Gagal memuat jumlah Sobat:', err.message);
+                el.textContent = '1+';
+            }
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadSobatCount);
+        } else {
+            loadSobatCount();
+        }
+    </script>
 </body>
 </html>
