@@ -148,7 +148,7 @@ curl -X POST <span class="h">https://your-domain.vercel.app/api/admin/products</
                 <span class="badge del">DELETE</span>
                 <code>/api/admin/codes</code>
             </div>
-            <p class="desc">CRUD kode pendaftaran. POST body: <code>{ count?: 1, prefix?: "TED", expires_at?: "ISO" }</code>. DELETE: <code>?id=&lt;uuid&gt;</code>.</p>
+            <p class="desc">CRUD kode pendaftaran. POST body: <code>{ count?: 1, prefix?: "TED" }</code>. Kode berlaku selamanya. DELETE: <code>?id=&lt;uuid&gt;</code>.</p>
             <pre><span class="c"># Generate 5 codes</span>
 curl -X POST <span class="h">https://your-domain.vercel.app/api/admin/codes</span> \
   -H <span class="s">"Authorization: Bearer &lt;token&gt;"</span> \

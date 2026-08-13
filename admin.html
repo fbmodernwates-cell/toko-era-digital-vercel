@@ -142,12 +142,9 @@
                         <label>Jumlah Kode</label>
                         <input type="number" id="codeCount" value="1" min="1" max="50">
                     </div>
-                    <div class="form-group">
-                        <label>Berlaku Sampai</label>
-                        <input type="date" id="codeExpiry">
-                    </div>
                     <button class="btn btn-primary" id="generateBtn">Generate Kode</button>
                 </div>
+                <p style="color:var(--text-muted);font-size:.85rem;margin-top:8px">Kode berlaku selamanya, tanpa tanggal kadaluarsa.</p>
                 <div id="generatedCodes"></div>
             </div>
 
@@ -359,17 +356,15 @@
 
         document.getElementById('generateBtn').addEventListener('click', async () => {
             const count = parseInt(document.getElementById('codeCount').value) || 1;
-            const expiry = document.getElementById('codeExpiry').value || null;
             const codesBox = document.getElementById('generatedCodes');
             const codes = [];
 
             for (let i = 0; i < count; i++) {
                 codes.push({
-                    code: generateRandomCode(),
-                    expires_at: expiry ? new Date(expiry).toISOString() : null
+                    code: generateRandomCode()
                 });
             }
-            // If no expiry date provided, codes remain valid indefinitely
+            // Kode berlaku selamanya — tidak ada tanggal kadaluarsa
 
             const { data, error } = await supabase.from('registration_codes').insert(codes).select();
             if (error) {

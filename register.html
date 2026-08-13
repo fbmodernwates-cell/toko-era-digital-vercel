@@ -152,13 +152,6 @@
                     return;
                 }
 
-                if (data.expires_at && new Date(data.expires_at) < new Date()) {
-                    showAlert('Kode sudah kedaluwarsa!', 'error');
-                    verifyBtn.disabled = false;
-                    verifyBtn.textContent = 'Verifikasi Kode';
-                    return;
-                }
-
                 verifiedCode = data;
                 document.getElementById('codeInfo').textContent = 'Kode valid: ' + code;
                 goToStep(2);

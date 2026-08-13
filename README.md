@@ -77,7 +77,7 @@ Lihat dokumentasi lengkap di `/api-docs` setelah deploy, atau baca ringkasan di 
 | POST    | `/api/admin/products`         | Create product `{ name, price, category?, stock?, ... }` |
 | DELETE  | `/api/admin/products?id=`     | Delete product by id                                      |
 | GET     | `/api/admin/codes`            | List registration codes (`?used=&limit=`)                 |
-| POST    | `/api/admin/codes`            | Generate codes `{ count?, prefix?, expires_at? }`         |
+| POST    | `/api/admin/codes`            | Generate codes `{ count?, prefix? }` — berlaku selamanya         |
 | DELETE  | `/api/admin/codes?id=`        | Delete code by id                                         |
 | POST    | `/api/admin/ban`              | Ban/unban user `{ userId, banned }`                       |
 | POST    | `/api/admin/reset-password`   | Reset password user lain `{ userId, newPassword? }`       |

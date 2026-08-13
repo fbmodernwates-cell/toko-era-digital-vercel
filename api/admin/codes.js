@@ -25,7 +25,7 @@ module.exports = withAdmin(async ({ req, res, profile }) => {
     const limit = Math.min(Number(searchParams.get("limit") || "200"), 1000);
 
     const opts = {
-      select: "id,code,is_used,used_by,expires_at,created_at",
+      select: "id,code,is_used,used_by,created_at",
       order: "created_at.desc",
       limit,
     };
@@ -43,17 +43,16 @@ module.exports = withAdmin(async ({ req, res, profile }) => {
 
     const count = Math.max(1, Math.min(Number(body.count || 1), 100));
     const prefix = body.prefix ? String(body.prefix).toUpperCase().slice(0, 8) : "TED";
-    const expiresAt = body.expires_at ? new Date(body.expires_at).toISOString() : null;
 
+    // Kode berlaku selamanya — tidak ada expires_at
     const codes = Array.from({ length: count }, () => ({
       code: generateCode(prefix),
-      expires_at: expiresAt,
     }));
 
     const { data, error } = await insertRow(
       "registration_codes",
       codes,
-      "id,code,expires_at,created_at"
+      "id,code,created_at"
     );
     if (error) return sendJson(res, { error: "Failed to generate codes", detail: error }, 500);
     return sendJson(res, { count: data.length, data, createdBy: profile.email }, 201);
