@@ -210,5 +210,30 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_sobat_count() TO anon, authenticated;
 
 -- ============================================
+-- RPC FUNCTION: get_seller_contact(uid)
+-- Public — return phone + full_name + email for a seller
+-- Used by public store page (/s/{userId} and /t/{slug}) to load
+-- WhatsApp contact info without exposing private data.
+-- SECURITY DEFINER — bypass RLS, only return public contact columns.
+-- ============================================
+
+CREATE OR REPLACE FUNCTION public.get_seller_contact(uid UUID)
+RETURNS JSON
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+  SELECT COALESCE(json_build_object(
+    'phone', p.phone,
+    'full_name', p.full_name,
+    'email', p.email
+  ), json_build_object()) AS contact
+  FROM profiles p
+  WHERE p.id = uid;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.get_seller_contact(UUID) TO anon, authenticated;
+
+-- ============================================
 -- SELESAI! Jalankan di Supabase SQL Editor
 -- ============================================

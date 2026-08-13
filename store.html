@@ -101,7 +101,7 @@
             </div>
 
             <div class="section-title">
-                <span>📦 Produk Etalase Pusat</span>
+                <span>📦 Produk Toko Terkini</span>
                 <span class="count" id="adminCount">0 produk</span>
             </div>
             <div id="adminProducts" class="product-grid">
@@ -109,7 +109,7 @@
             </div>
 
             <div class="footer">
-                Dibuat dengan ❤️ oleh <a href="/">TOKO ERA DIGITAL</a> · Toko online seumur hidup
+                Dibuat dengan ❤️ oleh <a href="/">TOKO ERA DIGITAL</a> &copy; 2026
             </div>
         </div>
     </div>
@@ -136,6 +136,25 @@
             if (!res.ok) {
                 const text = await res.text();
                 throw new Error('Supabase ' + res.status + ': ' + text.slice(0, 200));
+            }
+            return await res.json();
+        }
+
+        // Helper: panggil RPC function (POST with JSON body)
+        async function sbRpc(fn, body) {
+            const url = SUPABASE_URL + '/rest/v1/rpc/' + fn;
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'apikey': SUPABASE_ANON_KEY,
+                    'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body || {})
+            });
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error('Supabase RPC ' + fn + ' ' + res.status + ': ' + text.slice(0, 200));
             }
             return await res.json();
         }
@@ -239,15 +258,14 @@
         }
 
         async function loadProfileAndRender(store) {
-            // Load profile untuk dapat phone (untuk WhatsApp)
+            // Load seller contact (phone + full_name) via RPC function
+            // 'get_seller_contact' bypass RLS to return public contact info
             let profile = null;
             try {
-                const profiles = await sbGet('profiles', {
-                    select: 'full_name,phone',
-                    id: 'eq.' + userId,
-                    limit: '1'
-                });
-                if (profiles && profiles.length > 0) profile = profiles[0];
+                const result = await sbRpc('get_seller_contact', { uid: userId });
+                if (result && (result.phone || result.full_name)) {
+                    profile = result;
+                }
             } catch (e) { /* ignore — phone optional */ }
 
             renderStore({ ...store, phone: profile?.phone, full_name: profile?.full_name });
@@ -255,21 +273,16 @@
 
         async function loadProfileOnly(uid) {
             try {
-                const profiles = await sbGet('profiles', {
-                    select: 'full_name,phone,email',
-                    id: 'eq.' + uid,
-                    limit: '1'
-                });
-                if (!profiles || profiles.length === 0) {
+                const result = await sbRpc('get_seller_contact', { uid: uid });
+                if (!result || (!result.phone && !result.full_name)) {
                     showError('Toko tidak ditemukan', 'Pengguna tidak terdaftar atau toko belum aktif.');
                     return;
                 }
-                const p = profiles[0];
                 renderStore({
-                    store_name: (p.full_name || 'Sobat') + "'s Store",
-                    description: 'Toko ' + (p.full_name || 'Sobat Era Digital'),
+                    store_name: (result.full_name || 'Sobat') + "'s Store",
+                    description: 'Toko ' + (result.full_name || 'Sobat Era Digital'),
                     user_id: uid,
-                    phone: p.phone,
+                    phone: result.phone,
                     slug: null
                 });
             } catch (err) {
@@ -365,7 +378,7 @@
 
         function renderProductCard(p, type) {
             const badge = type === 'admin'
-                ? '<span class="badge badge-admin">Etalase Pusat</span>'
+                ? '<span class="badge badge-admin">Toko Terkini</span>'
                 : '<span class="badge badge-user">Produk Toko</span>';
             const img = p.image_url
                 ? '<img src="' + escapeHtml(p.image_url) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
@@ -397,23 +410,19 @@
                 '</div></div>';
         }
 
-        // Contact seller via WhatsApp — load phone from profiles
+        // Contact seller via WhatsApp — load phone via RPC function
         async function contactSeller(productName, price) {
             try {
-                const profiles = await sbGet('profiles', {
-                    select: 'phone,full_name',
-                    id: 'eq.' + userId,
-                    limit: '1'
-                });
-                const profile = profiles && profiles[0];
-                const phone = profile?.phone || '';
+                const result = await sbRpc('get_seller_contact', { uid: userId });
+                const phone = result?.phone || '';
+                const fullName = result?.full_name || '';
                 if (!phone) {
                     alert('Maaf, kontak penjual belum tersedia. Hubungi admin TOKO ERA DIGITAL.');
                     return;
                 }
                 const cleanPhone = phone.replace(/[^0-9]/g, '').replace(/^0/, '62');
                 const msg = encodeURIComponent(
-                    'Halo ' + (profile?.full_name || '') + ', saya ingin pesan:\n\n' +
+                    'Halo ' + fullName + ', saya ingin pesan:\n\n' +
                     '📦 ' + productName + '\n' +
                     '💰 Harga: Rp ' + Number(price).toLocaleString('id') + '\n\n' +
                     'Apakah masih tersedia?'
