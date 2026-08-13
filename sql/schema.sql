@@ -2,6 +2,12 @@
 -- TOKO ERA DIGITAL - Database Schema
 -- Jalankan di Supabase SQL Editor
 -- ============================================
+--
+-- Catatan keamanan:
+-- Policy admin menggunakan auth.jwt() -> 'user_metadata' ->> 'role' = 'admin'
+-- BUKAN subquery ke auth.users (yang akan error "permission denied" atau
+-- "infinite recursion" jika di-query dari policy di tabel profiles).
+-- ============================================
 
 -- 1. Tabel Profil
 CREATE TABLE IF NOT EXISTS profiles (
@@ -10,14 +16,35 @@ CREATE TABLE IF NOT EXISTS profiles (
   full_name TEXT,
   phone TEXT,
   role TEXT DEFAULT 'mitra',
+  is_banned BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can view own profile" ON profiles FOR SELECT USING (auth.uid() = id);
-CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
-CREATE POLICY "Admin can view all profiles" ON profiles FOR SELECT USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'));
+-- Drop existing policies (idempotent)
+DROP POLICY IF EXISTS "Users can view own profile" ON profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
+DROP POLICY IF EXISTS "Admin can view all profiles" ON profiles;
+DROP POLICY IF EXISTS "Admin can view all" ON profiles;
+DROP POLICY IF EXISTS "Admin can update all profiles" ON profiles;
+
+-- Recreate using auth.jwt() (NO recursion — does not query profiles/auth.users)
+CREATE POLICY "Users can view own profile" ON profiles
+  FOR SELECT USING (auth.uid() = id);
+
+CREATE POLICY "Users can update own profile" ON profiles
+  FOR UPDATE USING (auth.uid() = id);
+
+CREATE POLICY "Admin can view all profiles" ON profiles
+  FOR SELECT USING (
+    COALESCE((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin', false)
+  );
+
+CREATE POLICY "Admin can update all profiles" ON profiles
+  FOR UPDATE USING (
+    COALESCE((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin', false)
+  );
 
 -- Trigger: buat profil otomatis saat daftar
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -46,9 +73,17 @@ CREATE TABLE IF NOT EXISTS registration_codes (
 
 ALTER TABLE registration_codes ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admin full access registration_codes" ON registration_codes FOR ALL
-USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'));
-CREATE POLICY "Anyone can read registration_codes" ON registration_codes FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin full access registration_codes" ON registration_codes;
+DROP POLICY IF EXISTS "Admin full access" ON registration_codes;
+DROP POLICY IF EXISTS "Anyone can read registration_codes" ON registration_codes;
+
+CREATE POLICY "Anyone can read registration_codes" ON registration_codes
+  FOR SELECT USING (true);
+
+CREATE POLICY "Admin full access registration_codes" ON registration_codes
+  FOR ALL USING (
+    COALESCE((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin', false)
+  );
 
 -- 3. Tabel Produk Etalase (Admin)
 CREATE TABLE IF NOT EXISTS admin_products (
@@ -65,11 +100,20 @@ CREATE TABLE IF NOT EXISTS admin_products (
 
 ALTER TABLE admin_products ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Admin full access admin_products" ON admin_products FOR ALL
-USING (auth.uid() IN (SELECT id FROM auth.users WHERE raw_user_meta_data->>'role' = 'admin'));
-CREATE POLICY "Anyone can read active admin_products" ON admin_products FOR SELECT USING (is_active = true);
+DROP POLICY IF EXISTS "Admin full access admin_products" ON admin_products;
+DROP POLICY IF EXISTS "Admin full access products" ON admin_products;
+DROP POLICY IF EXISTS "Anyone can read active admin_products" ON admin_products;
+DROP POLICY IF EXISTS "Anyone can read active products" ON admin_products;
 
--- 4. Tabel Produk User
+CREATE POLICY "Anyone can read active admin_products" ON admin_products
+  FOR SELECT USING (is_active = true);
+
+CREATE POLICY "Admin full access admin_products" ON admin_products
+  FOR ALL USING (
+    COALESCE((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin', false)
+  );
+
+-- 4. Tabel Produk User (Sobat Era Digital)
 CREATE TABLE IF NOT EXISTS user_products (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -82,7 +126,8 @@ CREATE TABLE IF NOT EXISTS user_products (
 
 ALTER TABLE user_products ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can CRUD their own products" ON user_products FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can CRUD their own products" ON user_products
+  FOR ALL USING (auth.uid() = user_id);
 
 -- 5. Tabel Toko
 CREATE TABLE IF NOT EXISTS stores (
@@ -96,7 +141,8 @@ CREATE TABLE IF NOT EXISTS stores (
 
 ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
 
-CREATE POLICY "Users can manage their own store" ON stores FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage their own store" ON stores
+  FOR ALL USING (auth.uid() = user_id);
 
 -- ============================================
 -- SELESAI! Jalankan di Supabase SQL Editor
