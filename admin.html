@@ -6,7 +6,7 @@
     <title>Admin - TOKO ERA DIGITAL</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
@@ -258,8 +258,38 @@
         async function init() {
             const user = await getUser();
             if (!user) { window.location.href = '/login.html'; return; }
-            const isAdmin = user.user_metadata?.role === 'admin';
-            if (!isAdmin) { window.location.href = '/toko.html'; return; }
+
+            let profile = null;
+            try {
+                const res = await supabase.from('profiles').select('role, is_banned').eq('id', user.id).maybeSingle();
+                if (res.error) throw res.error;
+                profile = res.data;
+            } catch (err) {
+                console.error('Profile check failed', err);
+                await supabase.auth.signOut().catch(() => {});
+                window.location.href = '/login.html';
+                return;
+            }
+
+            if (!profile) {
+                await supabase.auth.signOut().catch(() => {});
+                window.location.href = '/login.html';
+                return;
+            }
+
+            if (profile.is_banned) {
+                await supabase.auth.signOut().catch(() => {});
+                alert('Akun Anda dibanned. Hubungi admin.');
+                window.location.href = '/login.html';
+                return;
+            }
+
+            const role = profile.role || 'mitra';
+            if (role !== 'admin') {
+                window.location.href = '/toko.html';
+                return;
+            }
+
             adminUser = user;
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('adminNav').style.display = 'flex';
