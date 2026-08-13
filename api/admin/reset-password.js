@@ -3,15 +3,7 @@
 
 const crypto = require("crypto");
 const { adminGetUserById, adminUpdateUserById } = require("../_lib/supabase");
-const { withAdmin, sendJson } = require("../_lib/auth");
-
-function parseBody(req) {
-  try {
-    return JSON.parse(req.body || "{}");
-  } catch {
-    return null;
-  }
-}
+const { withAdmin, sendJson, parseJsonBody } = require("../_lib/auth");
 
 function generateTempPassword(length = 16) {
   const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnpqrstuvwxyz23456789!@#$%^&*";
@@ -24,7 +16,7 @@ function generateTempPassword(length = 16) {
 }
 
 module.exports = withAdmin(async ({ req, res, profile }) => {
-  const body = parseBody(req);
+  const body = parseJsonBody(req);
   if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
   const userId = String(body.userId || "").trim();

@@ -76,6 +76,24 @@ function sendJson(res, body, status = 200) {
 }
 
 /**
+ * Parse request body — Vercel Node.js auto-parses JSON when Content-Type
+ * is application/json, putting the result in req.body. As a fallback,
+ * also try parsing raw body string. Returns null on parse failure.
+ */
+function parseJsonBody(req) {
+  // Already parsed (by Vercel middleware or by previous call)
+  if (req.body && typeof req.body === "object") return req.body;
+  if (typeof req.body === "string") {
+    try {
+      return JSON.parse(req.body);
+    } catch {
+      return null;
+    }
+  }
+  return null;
+}
+
+/**
  * Convenience: wrap an admin-only handler that receives { req, res, user, profile }.
  * Signature is Express-style: module.exports = withAdmin(async ({ req, res, user, profile }) => {...})
  */
@@ -116,6 +134,7 @@ module.exports = {
   getUserFromRequest,
   requireAdmin,
   sendJson,
+  parseJsonBody,
   withAdmin,
   withUser,
   ADMIN_ROLES,

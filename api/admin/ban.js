@@ -2,18 +2,10 @@
 // Body: { userId, banned }
 
 const { getProfile, updateProfile } = require("../_lib/supabase");
-const { withAdmin, sendJson } = require("../_lib/auth");
-
-function parseBody(req) {
-  try {
-    return JSON.parse(req.body || "{}");
-  } catch {
-    return null;
-  }
-}
+const { withAdmin, sendJson, parseJsonBody } = require("../_lib/auth");
 
 module.exports = withAdmin(async ({ req, res, profile }) => {
-  const body = parseBody(req);
+  const body = parseJsonBody(req);
   if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
   const userId = String(body.userId || "").trim();

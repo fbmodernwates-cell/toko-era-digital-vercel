@@ -4,7 +4,7 @@
 // DELETE /api/admin/codes?id=<uuid>
 
 const { listTable, insertRow, deleteRow } = require("../_lib/supabase");
-const { withAdmin, sendJson } = require("../_lib/auth");
+const { withAdmin, sendJson, parseJsonBody } = require("../_lib/auth");
 
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -14,14 +14,6 @@ function generateCode(prefix = "TED") {
     code += CODE_CHARS.charAt(Math.floor(Math.random() * CODE_CHARS.length));
   }
   return code;
-}
-
-function parseBody(req) {
-  try {
-    return JSON.parse(req.body || "{}");
-  } catch {
-    return null;
-  }
 }
 
 module.exports = withAdmin(async ({ req, res, profile }) => {
@@ -46,7 +38,7 @@ module.exports = withAdmin(async ({ req, res, profile }) => {
   }
 
   if (method === "POST") {
-    const body = parseBody(req);
+    const body = parseJsonBody(req);
     if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
     const count = Math.max(1, Math.min(Number(body.count || 1), 100));

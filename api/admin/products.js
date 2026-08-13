@@ -4,15 +4,7 @@
 // DELETE /api/admin/products?id=<uuid>
 
 const { listTable, insertRow, deleteRow } = require("../_lib/supabase");
-const { withAdmin, sendJson } = require("../_lib/auth");
-
-function parseBody(req) {
-  try {
-    return JSON.parse(req.body || "{}");
-  } catch {
-    return null;
-  }
-}
+const { withAdmin, sendJson, parseJsonBody } = require("../_lib/auth");
 
 module.exports = withAdmin(async ({ req, res, profile }) => {
   const method = (req.method || "GET").toUpperCase();
@@ -36,7 +28,7 @@ module.exports = withAdmin(async ({ req, res, profile }) => {
   }
 
   if (method === "POST") {
-    const body = parseBody(req);
+    const body = parseJsonBody(req);
     if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
     const name = String(body.name || "").trim();
