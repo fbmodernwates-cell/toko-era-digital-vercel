@@ -227,8 +227,6 @@
             .nav { flex-direction: column; gap: 12px; }
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
-    <script src="js/supabase-config.js"></script>
 </head>
 <body>
     <nav class="nav">
@@ -340,31 +338,28 @@
     <script>
         // Hitung jumlah Sobat Era Digital yang terdaftar (termasuk admin)
         // secara real-time via RPC function get_sobat_count().
-        // Function dijalankan sebagai SECURITY DEFINER (bypass RLS)
-        // tapi hanya return angka — tidak ekspos data pribadi.
+        // Pakai native fetch — tidak butuh Supabase SDK (lebih reliable).
         // Fallback ke "1+" jika gagal load.
+
+        const SUPABASE_URL_HOME = 'https://msqgmtvbxzhsbleraysu.supabase.co';
+        const SUPABASE_ANON_KEY_HOME = 'sb_publishable_k3zaTPaPEUr_yLeE-gIJgw_egDCeyFp';
 
         async function loadSobatCount() {
             const el = document.getElementById('sobatCount');
             if (!el) return;
             try {
-                if (!window.supabase || typeof window.supabase.createClient !== 'function') {
-                    throw new Error('Supabase SDK belum loaded');
-                }
-                const client = window.supabase;
-
-                // Panggil RPC function (POST, body kosong)
-                const { data, error } = await client
-                    .rpc('get_sobat_count');
-
-                if (error) throw error;
-
-                // data adalah angka integer (count)
-                const count = Number(data) || 0;
-
-                // Tampilkan angka real + "+" — supaya terlihat dinamis
-                // Contoh: 2 → "2+", 25 → "25+", 100 → "100+"
-                if (count > 0) {
+                const res = await fetch(SUPABASE_URL_HOME + '/rest/v1/rpc/get_sobat_count', {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY_HOME,
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY_HOME,
+                        'Content-Type': 'application/json'
+                    },
+                    body: '{}'
+                });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const count = await res.json();
+                if (count !== null && count !== undefined && count > 0) {
                     el.textContent = count + '+';
                 } else {
                     el.textContent = '1+';

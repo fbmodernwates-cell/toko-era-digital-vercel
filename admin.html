@@ -190,6 +190,7 @@
             <button class="tab active" data-tab="codes">Kode Pendaftaran</button>
             <button class="tab" data-tab="products">Produk Etalase</button>
             <button class="tab" data-tab="users">Sobat Era Digital</button>
+            <button class="tab" data-tab="sales">Penjualan & Komisi</button>
             <button class="tab" data-tab="settings">Pengaturan</button>
         </div>
 
@@ -320,6 +321,29 @@
             </div>
         </div>
 
+        <!-- TAB: PENJUALAN & KOMISI -->
+        <div class="tab-content" id="tab-sales">
+            <div class="card">
+                <h2>Ringkasan Komisi Sobat</h2>
+                <p style="color:var(--text-muted);font-size:.8rem;margin-bottom:12px">
+                    Total penjualan via link Sobat. Klik "Konfirmasi" jika transaksi benar-benar terjadi, "Bayar Komisi" jika komisi sudah dibayar ke Sobat.
+                </p>
+                <div class="product-grid" id="sobatCommissionSummary" style="grid-template-columns:1fr">
+                    <div class="empty" style="grid-column:1/-1">Memuat data...</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Daftar Penjualan</h2>
+                <p style="color:var(--text-muted);font-size:.8rem;margin-bottom:12px">
+                    Semua transaksi yang masuk via link Sobat Era Digital. Tracking code dipakai untuk verifikasi.
+                </p>
+                <div class="product-grid" id="salesList" style="grid-template-columns:1fr">
+                    <div class="empty" style="grid-column:1/-1">Memuat data...</div>
+                </div>
+            </div>
+        </div>
+
         <!-- TAB: PENGATURAN -->
         <div class="tab-content" id="tab-settings">
             <div class="card">
@@ -414,6 +438,7 @@
             loadProducts();
             loadUsers();
             loadStats();
+            loadSales();
         }
 
         // ============ KODE PENDAFTARAN ============
@@ -729,6 +754,142 @@
             } catch (err) {
                 console.error('Reset password failed', err);
                 alert('Gagal: ' + (err.message || err));
+            }
+        }
+
+        // ============ PENJUALAN & KOMISI ============
+        async function loadSales() {
+            try {
+                const { data, error } = await supabase
+                    .from('sales')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                if (error) throw error;
+
+                const listEl = document.getElementById('salesList');
+                const summaryEl = document.getElementById('sobatCommissionSummary');
+
+                if (!data || data.length === 0) {
+                    listEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada penjualan tercatat. Penjualan akan muncul otomatis saat pembeli klik "Pesan Sekarang" di link toko Sobat.</div>';
+                    summaryEl.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada penjualan.</div>';
+                    return;
+                }
+
+                // Render list
+                listEl.innerHTML = data.map(s => renderSaleCard(s)).join('');
+
+                // Compute summary per referrer
+                const byReferrer = {};
+                data.forEach(s => {
+                    const key = s.referrer_id || 'unknown';
+                    if (!byReferrer[key]) {
+                        byReferrer[key] = { referrer_id: key, total_sales: 0, total_amount: 0, total_commission: 0, confirmed: 0, paid: 0, sales: [] };
+                    }
+                    byReferrer[key].total_sales++;
+                    byReferrer[key].total_amount += Number(s.total_price || 0);
+                    byReferrer[key].total_commission += Number(s.commission_earned || 0);
+                    if (s.status === 'confirmed' || s.status === 'paid') byReferrer[key].confirmed++;
+                    if (s.status === 'paid') byReferrer[key].paid++;
+                    byReferrer[key].sales.push(s);
+                });
+
+                // Load referrer names
+                const referrerIds = Object.keys(byReferrer).filter(id => id !== 'unknown' && id !== null);
+                let referrerMap = {};
+                if (referrerIds.length > 0) {
+                    const { data: profiles } = await supabase
+                        .from('profiles')
+                        .select('id, email, full_name, phone')
+                        .in('id', referrerIds);
+                    if (profiles) {
+                        profiles.forEach(p => { referrerMap[p.id] = p; });
+                    }
+                }
+
+                // Render summary
+                summaryEl.innerHTML = Object.values(byReferrer).map(b => {
+                    const p = referrerMap[b.referrer_id];
+                    const name = p?.full_name || p?.email || 'Tidak diketahui';
+                    const phone = p?.phone || '-';
+                    return `<div class="product-card" style="grid-column:1/-1">
+                        <div class="body" style="padding:14px">
+                            <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                                <strong>${escapeHtml(name)}</strong>
+                                <span class="badge badge-yellow">${b.total_sales} penjualan</span>
+                            </div>
+                            <div class="meta">📱 ${escapeHtml(phone)}</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-top:10px;font-size:.82rem">
+                                <div><div class="meta">Total Penjualan</div><div style="font-weight:700;color:var(--primary-dark)">Rp ${Number(b.total_amount).toLocaleString('id')}</div></div>
+                                <div><div class="meta">Total Komisi</div><div style="font-weight:700;color:var(--success)">Rp ${Number(b.total_commission).toLocaleString('id')}</div></div>
+                                <div><div class="meta">Konfirmasi</div><div style="font-weight:700">${b.confirmed}/${b.total_sales}</div></div>
+                                <div><div class="meta">Sudah Dibayar</div><div style="font-weight:700">${b.paid}/${b.total_sales}</div></div>
+                            </div>
+                        </div>
+                    </div>`;
+                }).join('');
+            } catch (err) {
+                console.error('loadSales error', err);
+                document.getElementById('salesList').innerHTML = '<div class="empty" style="grid-column:1/-1">Gagal memuat data penjualan: ' + err.message + '</div>';
+                document.getElementById('sobatCommissionSummary').innerHTML = '<div class="empty" style="grid-column:1/-1">Gagal memuat ringkasan.</div>';
+            }
+        }
+
+        function renderSaleCard(s) {
+            const statusBadge = s.status === 'pending'
+                ? '<span class="badge badge-yellow">⏳ Menunggu Konfirmasi</span>'
+                : s.status === 'confirmed'
+                ? '<span class="badge badge-green">✓ Dikonfirmasi</span>'
+                : s.status === 'paid'
+                ? '<span class="badge badge-green">💰 Komisi Dibayar</span>'
+                : '<span class="badge badge-red">Dibatalkan</span>';
+            const date = new Date(s.created_at).toLocaleString('id', { day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+            let actions = '';
+            if (s.status === 'pending') {
+                actions = `<button class="btn btn-success btn-sm" onclick="updateSaleStatus('${s.id}','confirmed')">✓ Konfirmasi</button>
+                           <button class="btn btn-danger btn-sm" onclick="updateSaleStatus('${s.id}','cancelled')">✗ Batalkan</button>`;
+            } else if (s.status === 'confirmed') {
+                actions = `<button class="btn btn-primary btn-sm" onclick="updateSaleStatus('${s.id}','paid')">💰 Bayar Komisi</button>`;
+            }
+            return `<div class="product-card" style="grid-column:1/-1">
+                <div class="body" style="padding:14px">
+                    <div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+                        <div>
+                            <strong>${escapeHtml(s.product_name)}</strong>
+                            <div class="meta">🏷️ ${s.tracking_code || '-'}</div>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;font-size:.82rem">
+                        <div><div class="meta">Qty</div><div>${s.qty}</div></div>
+                        <div><div class="meta">Harga Satuan</div><div>Rp ${Number(s.product_price).toLocaleString('id')}</div></div>
+                        <div><div class="meta">Total</div><div style="font-weight:700">Rp ${Number(s.total_price).toLocaleString('id')}</div></div>
+                        <div><div class="meta">Komisi Sobat</div><div style="font-weight:700;color:var(--success)">Rp ${Number(s.commission_earned).toLocaleString('id')}</div></div>
+                        ${s.buyer_name ? `<div><div class="meta">Pembeli</div><div>${escapeHtml(s.buyer_name)}</div></div>` : ''}
+                        ${s.buyer_phone ? `<div><div class="meta">WhatsApp Pembeli</div><div>${escapeHtml(s.buyer_phone)}</div></div>` : ''}
+                        <div><div class="meta">Tanggal</div><div>${date}</div></div>
+                    </div>
+                    ${actions ? `<div style="display:flex;gap:6px;margin-top:10px">${actions}</div>` : ''}
+                </div>
+            </div>`;
+        }
+
+        async function updateSaleStatus(saleId, newStatus) {
+            const confirmMsg = newStatus === 'confirmed'
+                ? 'Konfirmasi penjualan ini? Komisi Sobat akan dihitung.'
+                : newStatus === 'paid'
+                ? 'Tandai komisi sudah dibayar ke Sobat?'
+                : 'Batalkan penjualan ini? Komisi tidak akan dibayar.';
+            if (!confirm(confirmMsg)) return;
+            try {
+                const update = { status: newStatus };
+                if (newStatus === 'confirmed') update.confirmed_at = new Date().toISOString();
+                if (newStatus === 'paid') update.paid_at = new Date().toISOString();
+                const { error } = await supabase.from('sales').update(update).eq('id', saleId);
+                if (error) throw error;
+                loadSales();
+                loadStats();
+            } catch (err) {
+                alert('Gagal update: ' + err.message);
             }
         }
 

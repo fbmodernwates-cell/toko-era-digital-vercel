@@ -235,5 +235,113 @@ $$;
 GRANT EXECUTE ON FUNCTION public.get_seller_contact(UUID) TO anon, authenticated;
 
 -- ============================================
+-- TABEL: sales — track penjualan produk admin via link Sobat
+-- ============================================
+CREATE TABLE IF NOT EXISTS sales (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  product_id UUID NOT NULL REFERENCES admin_products(id) ON DELETE CASCADE,
+  product_name TEXT NOT NULL,
+  product_price NUMERIC NOT NULL DEFAULT 0,
+  qty INTEGER NOT NULL DEFAULT 1,
+  total_price NUMERIC NOT NULL DEFAULT 0,
+  seller_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  referrer_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  buyer_name TEXT,
+  buyer_phone TEXT,
+  buyer_note TEXT,
+  commission_type TEXT DEFAULT 'percent',
+  commission_percent NUMERIC(5,2) DEFAULT 0,
+  commission_fixed NUMERIC DEFAULT 0,
+  commission_earned NUMERIC NOT NULL DEFAULT 0,
+  status TEXT NOT NULL DEFAULT 'pending',
+  tracking_code TEXT UNIQUE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  confirmed_at TIMESTAMPTZ,
+  paid_at TIMESTAMPTZ
+);
+
+ALTER TABLE sales ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Anyone can create sale" ON sales;
+CREATE POLICY "Anyone can create sale" ON sales
+  FOR INSERT TO anon, authenticated WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Admin full access sales" ON sales;
+CREATE POLICY "Admin full access sales" ON sales
+  FOR ALL USING (
+    COALESCE((auth.jwt() -> 'user_metadata' ->> 'role') = 'admin', false)
+  );
+
+DROP POLICY IF EXISTS "Sobat view own sales" ON sales;
+CREATE POLICY "Sobat view own sales" ON sales
+  FOR SELECT USING (auth.uid() = referrer_id);
+
+CREATE INDEX IF NOT EXISTS sales_referrer_id_idx ON sales(referrer_id) WHERE referrer_id IS NOT NULL;
+CREATE INDEX IF NOT EXISTS sales_status_idx ON sales(status);
+CREATE INDEX IF NOT EXISTS sales_created_at_idx ON sales(created_at DESC);
+
+-- ============================================
+-- RPC: create_sale — create sale record with commission snapshot
+-- ============================================
+CREATE OR REPLACE FUNCTION public.create_sale(
+  p_product_id UUID,
+  p_referrer_id UUID,
+  p_qty INTEGER DEFAULT 1,
+  p_buyer_name TEXT DEFAULT NULL,
+  p_buyer_phone TEXT DEFAULT NULL,
+  p_buyer_note TEXT DEFAULT NULL
+)
+RETURNS JSON
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public
+AS $$
+DECLARE
+  v_product admin_products%ROWTYPE;
+  v_total NUMERIC;
+  v_commission NUMERIC;
+  v_tracking TEXT;
+  v_sale sales%ROWTYPE;
+BEGIN
+  SELECT * INTO v_product FROM admin_products WHERE id = p_product_id AND is_active = true;
+  IF NOT FOUND THEN
+    RETURN json_build_object('error', 'Product not found or inactive');
+  END IF;
+  IF p_qty < 1 THEN
+    RETURN json_build_object('error', 'Quantity must be at least 1');
+  END IF;
+  v_total := v_product.price * p_qty;
+  IF v_product.commission_type = 'percent' THEN
+    v_commission := v_total * COALESCE(v_product.commission_percent, 0) / 100;
+  ELSE
+    v_commission := COALESCE(v_product.commission_fixed, 0) * p_qty;
+  END IF;
+  v_tracking := 'TED-' || upper(substr(md5(random()::text || clock_timestamp()::text), 1, 8));
+  INSERT INTO sales (
+    product_id, product_name, product_price, qty, total_price,
+    seller_id, referrer_id,
+    buyer_name, buyer_phone, buyer_note,
+    commission_type, commission_percent, commission_fixed, commission_earned,
+    tracking_code, status
+  ) VALUES (
+    v_product.id, v_product.name, v_product.price, p_qty, v_total,
+    NULL, p_referrer_id,
+    p_buyer_name, p_buyer_phone, p_buyer_note,
+    v_product.commission_type, v_product.commission_percent, v_product.commission_fixed, v_commission,
+    v_tracking, 'pending'
+  )
+  RETURNING * INTO v_sale;
+  RETURN json_build_object(
+    'sale', row_to_json(v_sale),
+    'tracking_code', v_tracking,
+    'commission_earned', v_commission,
+    'total_price', v_total
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION public.create_sale(UUID, UUID, INTEGER, TEXT, TEXT, TEXT) TO anon, authenticated;
+
+-- ============================================
 -- SELESAI! Jalankan di Supabase SQL Editor
 -- ============================================

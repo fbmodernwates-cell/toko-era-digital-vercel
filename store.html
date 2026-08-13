@@ -93,14 +93,6 @@
 
         <div class="container">
             <div class="section-title">
-                <span>🛍️ Produk Toko</span>
-                <span class="count" id="myCount">0 produk</span>
-            </div>
-            <div id="myProducts" class="product-grid">
-                <div class="empty" style="grid-column:1/-1">Belum ada produk di toko ini</div>
-            </div>
-
-            <div class="section-title">
                 <span>📦 Produk Toko Terkini</span>
                 <span class="count" id="adminCount">0 produk</span>
             </div>
@@ -249,7 +241,6 @@
                     }
                 }
 
-                loadMyProducts();
                 loadAdminProducts();
             } catch (err) {
                 console.error('init error', err);
@@ -334,27 +325,6 @@
             document.title = name + ' - TOKO ERA DIGITAL';
         }
 
-        async function loadMyProducts() {
-            try {
-                const data = await sbGet('user_products', {
-                    select: '*',
-                    user_id: 'eq.' + userId,
-                    order: 'created_at.desc'
-                });
-                const container = document.getElementById('myProducts');
-                if (!data || data.length === 0) {
-                    container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk di toko ini. Sobat belum menambahkan produk.</div>';
-                    document.getElementById('myCount').textContent = '0 produk';
-                    return;
-                }
-                document.getElementById('myCount').textContent = data.length + ' produk';
-                container.innerHTML = data.map(p => renderProductCard(p, 'user')).join('');
-            } catch (err) {
-                console.warn('loadMyProducts error', err);
-                document.getElementById('myProducts').innerHTML = '<div class="empty" style="grid-column:1/-1">Gagal memuat produk toko.</div>';
-            }
-        }
-
         async function loadAdminProducts() {
             try {
                 const data = await sbGet('admin_products', {
@@ -387,14 +357,15 @@
             let commissionTag = '';
             if (type === 'admin') {
                 if (p.commission_type === 'percent' && p.commission_percent > 0) {
-                    commissionTag = '<div class="commission">💰 Komisi: ' + p.commission_percent + '%</div>';
+                    commissionTag = '<div class="commission">💰 Komisi Sobat: ' + p.commission_percent + '%</div>';
                 } else if (p.commission_type === 'fixed' && p.commission_fixed > 0) {
-                    commissionTag = '<div class="commission">💰 Komisi: ' + formatRp(p.commission_fixed) + '</div>';
+                    commissionTag = '<div class="commission">💰 Komisi Sobat: ' + formatRp(p.commission_fixed) + '</div>';
                 }
             }
 
+            // Pass product data via data attributes for contactSeller to use
             const buyBtn = p.stock > 0
-                ? '<button class="buy-btn" onclick="contactSeller(\'' + (p.name || '').replace(/'/g, "\\'") + '\', ' + (p.price || 0) + ')">🛒 Pesan Sekarang</button>'
+                ? '<button class="buy-btn" data-product-id="' + p.id + '" data-product-name="' + escapeHtml(p.name) + '" data-product-price="' + p.price + '" data-product-stock="' + p.stock + '" onclick="contactSeller(this)">🛒 Pesan Sekarang</button>'
                 : '<div class="out-of-stock">Stok habis</div>';
 
             const desc = p.description
@@ -410,26 +381,75 @@
                 '</div></div>';
         }
 
-        // Contact seller via WhatsApp — load phone via RPC function
-        async function contactSeller(productName, price) {
+        // Contact seller via WhatsApp + create sale record for commission tracking
+        // When buyer clicks "Pesan Sekarang" on Sobat's public link:
+        //   1. Create sale record (RPC create_sale) with referrer_id = this Sobat
+        //   2. Open WhatsApp to seller's phone with tracking code in message
+        //   3. Admin can later verify sale & mark commission as paid
+        async function contactSeller(btn) {
+            const productId = btn.dataset.productId;
+            const productName = btn.dataset.productName;
+            const productPrice = parseFloat(btn.dataset.productPrice);
+
+            // Ask buyer for quantity & name (simple prompt UI)
+            const qty = parseInt(prompt('Jumlah pesanan:', '1')) || 1;
+            if (qty < 1) { alert('Jumlah minimal 1'); return; }
+            const buyerName = prompt('Nama Anda (opsional):', '') || '';
+            const buyerPhone = prompt('Nomor WhatsApp Anda (opsional, untuk konfirmasi):', '') || '';
+
+            // Disable button + show loading
+            const originalText = btn.textContent;
+            btn.disabled = true;
+            btn.textContent = '⏳ Membuat pesanan...';
+
             try {
-                const result = await sbRpc('get_seller_contact', { uid: userId });
-                const phone = result?.phone || '';
-                const fullName = result?.full_name || '';
+                // Create sale record via RPC — referrer_id = userId (this Sobat's link)
+                const result = await sbRpc('create_sale', {
+                    p_product_id: productId,
+                    p_referrer_id: userId,
+                    p_qty: qty,
+                    p_buyer_name: buyerName || null,
+                    p_buyer_phone: buyerPhone || null,
+                    p_buyer_note: null
+                });
+
+                if (result && result.error) {
+                    throw new Error(result.error);
+                }
+
+                const trackingCode = result.tracking_code || 'N/A';
+                const commission = result.commission_earned || 0;
+                const total = result.total_price || (productPrice * qty);
+
+                // Load seller contact info via RPC
+                const contactResult = await sbRpc('get_seller_contact', { uid: userId });
+                const phone = contactResult?.phone || '';
+                const fullName = contactResult?.full_name || '';
+
                 if (!phone) {
-                    alert('Maaf, kontak penjual belum tersedia. Hubungi admin TOKO ERA DIGITAL.');
+                    alert('Pesanan tercatat! Tracking code: ' + trackingCode + '\n\n' +
+                          'Namun kontak penjual belum tersedia. Admin akan menghubungi Anda.');
                     return;
                 }
+
                 const cleanPhone = phone.replace(/[^0-9]/g, '').replace(/^0/, '62');
                 const msg = encodeURIComponent(
-                    'Halo ' + fullName + ', saya ingin pesan:\n\n' +
+                    'Halo ' + fullName + '! Saya ingin pesan produk dari toko Anda:\n\n' +
                     '📦 ' + productName + '\n' +
-                    '💰 Harga: Rp ' + Number(price).toLocaleString('id') + '\n\n' +
-                    'Apakah masih tersedia?'
+                    '💰 Harga: Rp ' + Number(productPrice).toLocaleString('id') + ' x ' + qty + '\n' +
+                    '💵 Total: Rp ' + Number(total).toLocaleString('id') + '\n\n' +
+                    '🏷️ Kode Pesanan: ' + trackingCode + '\n' +
+                    (buyerName ? '👤 Nama: ' + buyerName + '\n' : '') +
+                    (buyerPhone ? '📱 WhatsApp: ' + buyerPhone + '\n' : '') +
+                    '\nApakah masih tersedia? Mohon konfirmasi ya, terima kasih!'
                 );
                 window.open('https://wa.me/' + cleanPhone + '?text=' + msg, '_blank');
             } catch (err) {
-                alert('Gagal memuat info penjual: ' + err.message);
+                console.error('contactSeller error', err);
+                alert('Gagal membuat pesanan: ' + err.message + '\n\nSilakan coba lagi atau hubungi admin.');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = originalText;
             }
         }
     </script>
