@@ -188,10 +188,10 @@
                 <div class="table-wrap">
                     <table>
                         <thead>
-                            <tr><th>Nama</th><th>Email</th><th>WhatsApp</th><th>Tanggal Daftar</th></tr>
+                            <tr><th>Nama</th><th>Email</th><th>WhatsApp</th><th>Tanggal Daftar</th><th>Status</th><th>Aksi</th></tr>
                         </thead>
                         <tbody id="usersList">
-                            <tr><td colspan="4" class="empty">Memuat data...</td></tr>
+                            <tr><td colspan="6" class="empty">Memuat data...</td></tr>
                         </tbody>
                     </table>
                 </div>
@@ -362,20 +362,38 @@
         async function loadUsers() {
             const { data: codes } = await supabase.from('registration_codes').select('used_by').not('used_by', 'is', null);
             if (!codes || codes.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="4" class="empty">Belum ada mitra terdaftar</td></tr>';
+                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada mitra terdaftar</td></tr>';
                 return;
             }
             const userIds = [...new Set(codes.map(c => c.used_by))];
             const { data: profiles } = await supabase.from('profiles').select('*').in('id', userIds);
             if (!profiles || profiles.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="4" class="empty">Belum ada mitra</td></tr>';
+                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada mitra</td></tr>';
                 return;
             }
             let html = '';
             profiles.forEach(u => {
-                html += '<tr><td>' + (u.full_name || '-') + '</td><td>' + u.email + '</td><td>' + (u.phone || '-') + '</td><td>' + new Date(u.created_at).toLocaleDateString('id') + '</td></tr>';
+                const status = u.is_banned ? '<span class="badge badge-red">Dibanned</span>' : '<span class="badge badge-green">Aktif</span>';
+                const actions = u.is_banned
+                    ? '<button class="btn btn-success btn-sm" onclick="restoreUser(\'' + u.id + '\')">Pulihkan</button>'
+                    : '<button class="btn btn-danger btn-sm" onclick="banUser(\'' + u.id + '\')">Banned</button>';
+                html += '<tr><td>' + (u.full_name || '-') + '</td><td>' + u.email + '</td><td>' + (u.phone || '-') + '</td><td>' + new Date(u.created_at).toLocaleDateString('id') + '</td><td>' + status + '</td><td>' + actions + '</td></tr>';
             });
             document.getElementById('usersList').innerHTML = html;
+        }
+
+        async function banUser(id) {
+            if (!confirm('Banned akun mitra ini?')) return;
+            const { error } = await supabase.from('profiles').update({ is_banned: true }).eq('id', id);
+            if (error) { alert('Gagal banned: ' + error.message); return; }
+            loadUsers();
+        }
+
+        async function restoreUser(id) {
+            if (!confirm('Pulihkan akun mitra ini?')) return;
+            const { error } = await supabase.from('profiles').update({ is_banned: false }).eq('id', id);
+            if (error) { alert('Gagal pulihkan: ' + error.message); return; }
+            loadUsers();
         }
 
         // ============ PENGATURAN ============

@@ -88,6 +88,14 @@
                 }
 
                 const user = data.user;
+                const { data: profile, error: profileError } = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
+                if (profileError || profile?.is_banned) {
+                    await supabase.auth.signOut();
+                    showAlert('Akun Anda dibanned. Hubungi admin.', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Login';
+                    return;
+                }
                 const role = user.user_metadata?.role;
                 if (role === 'admin') {
                     window.location.href = '/admin.html';
