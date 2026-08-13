@@ -191,7 +191,7 @@
                 document.getElementById('storeDesc').value = '';
                 return;
             }
-            card.innerHTML = '<div class="product-card"><span class="badge badge-user">Toko Saya</span><h3>' + (data.store_name || 'Toko Saya') + '</h3><div class="desc'> + (data.description ? data.description : '') + '</div></div>';
+            card.innerHTML = '<div class="product-card"><span class="badge badge-user">Toko Saya</span><h3>' + escapeHtml(data.store_name || 'Toko Saya') + '</h3><div class="desc">' + escapeHtml(data.description || '') + '</div></div>';
             document.getElementById('storeName').value = data.store_name || '';
             document.getElementById('storeDesc').value = data.description || '';
         }
@@ -223,7 +223,7 @@
             document.getElementById('totalAdmin').textContent = data.length;
             let html = '';
             data.forEach(p => {
-                html += '<div class="product-card"><span class="badge badge-admin">Etalase</span><h3>' + p.name + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + p.description + '</div>' : '') + '</div>';
+                html += '<div class="product-card"><span class="badge badge-admin">Etalase</span><h3>' + escapeHtml(p.name) + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + escapeHtml(p.description) + '</div>' : '') + '</div>';
             });
             container.innerHTML = html;
             updateTotal();
@@ -242,7 +242,7 @@
             document.getElementById('totalUser').textContent = data.length;
             let html = '';
             data.forEach(p => {
-                html += '<div class="product-card"><span class="badge badge-user">Produk Saya</span><h3>' + p.name + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + p.description + '</div>' : '') + '<div style="margin-top:10px"><button onclick="deleteMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--error);cursor:pointer;font-weight:600;font-size:.8rem">Hapus</button></div></div>';
+                html += '<div class="product-card"><span class="badge badge-user">Produk Saya</span><h3>' + escapeHtml(p.name) + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + escapeHtml(p.description) + '</div>' : '') + '<div style="margin-top:10px;display:flex;gap:10px"><button onclick="editMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--primary-dark);cursor:pointer;font-weight:600;font-size:.8rem">Edit</button><button onclick="deleteMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--error);cursor:pointer;font-weight:600;font-size:.8rem">Hapus</button></div></div>';
             });
             container.innerHTML = html;
             updateTotal();
@@ -260,24 +260,49 @@
             loadUserProducts();
         }
 
+        async function editMyProduct(id) {
+            const { data } = await supabase.from('user_products').select('*').eq('id', id).maybeSingle();
+            if (!data) return;
+            document.getElementById('pName').value = data.name || '';
+            document.getElementById('pPrice').value = data.price || '';
+            document.getElementById('pStock').value = data.stock || '';
+            document.getElementById('pDesc').value = data.description || '';
+            document.getElementById('productModal').classList.add('active');
+            window.__editProductId = id;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
         // MODAL
         document.getElementById('addMyProductBtn').addEventListener('click', () => {
             document.getElementById('productModal').classList.add('active');
         });
         document.getElementById('cancelBtn').addEventListener('click', () => {
+            window.__editProductId = null;
             document.getElementById('productModal').classList.remove('active');
         });
 
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const { error } = await supabase.from('user_products').insert({
+            const payload = {
                 user_id: currentUser.id,
                 name: document.getElementById('pName').value.trim(),
                 price: document.getElementById('pPrice').value,
                 stock: document.getElementById('pStock').value,
                 description: document.getElementById('pDesc').value.trim()
-            });
+            };
+            if (window.__editProductId) {
+                payload.id = window.__editProductId;
+            }
+            const { error } = window.__editProductId
+                ? await supabase.from('user_products').update(payload).eq('id', window.__editProductId)
+                : await supabase.from('user_products').insert(payload);
             if (error) { alert('Gagal: ' + error.message); return; }
+            window.__editProductId = null;
             document.getElementById('productModal').classList.remove('active');
             e.target.reset();
             loadUserProducts();
