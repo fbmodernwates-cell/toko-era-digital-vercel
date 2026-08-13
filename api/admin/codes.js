@@ -1,14 +1,10 @@
 // /api/admin/codes
-// GET    /api/admin/codes              → list all registration codes
-// POST   /api/admin/codes              → generate N codes
-// DELETE /api/admin/codes?id=<uuid>    → delete a code
+// GET    /api/admin/codes
+// POST   /api/admin/codes
+// DELETE /api/admin/codes?id=<uuid>
 
-const {
-  listTable,
-  insertRow,
-  deleteRow,
-} = require("../_lib/supabase");
-const { withAdmin, json } = require("../_lib/auth");
+const { listTable, insertRow, deleteRow } = require("../_lib/supabase");
+const { withAdmin, sendJson } = require("../_lib/auth");
 
 const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -28,10 +24,9 @@ function parseBody(req) {
   }
 }
 
-module.exports = withAdmin(async ({ req, profile }) => {
+module.exports = withAdmin(async ({ req, res, profile }) => {
   const method = (req.method || "GET").toUpperCase();
 
-  // GET: list
   if (method === "GET") {
     const { searchParams } = new URL(req.url || "", "http://localhost");
     const isUsed = searchParams.get("used");
@@ -46,14 +41,13 @@ module.exports = withAdmin(async ({ req, profile }) => {
     if (isUsed === "false") opts.eq = { is_used: false };
 
     const { data, error, count } = await listTable("registration_codes", opts);
-    if (error) return json({ error: "Failed to load codes", detail: error }, 500);
-    return json({ count: count ?? data.length, data });
+    if (error) return sendJson(res, { error: "Failed to load codes", detail: error }, 500);
+    return sendJson(res, { count: count ?? data.length, data });
   }
 
-  // POST: generate
   if (method === "POST") {
     const body = parseBody(req);
-    if (!body) return json({ error: "Invalid JSON body" }, 400);
+    if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
     const count = Math.max(1, Math.min(Number(body.count || 1), 100));
     const prefix = body.prefix ? String(body.prefix).toUpperCase().slice(0, 8) : "TED";
@@ -69,21 +63,20 @@ module.exports = withAdmin(async ({ req, profile }) => {
       codes,
       "id,code,expires_at,created_at"
     );
-    if (error) return json({ error: "Failed to generate codes", detail: error }, 500);
-    return json({ count: data.length, data, createdBy: profile.email }, 201);
+    if (error) return sendJson(res, { error: "Failed to generate codes", detail: error }, 500);
+    return sendJson(res, { count: data.length, data, createdBy: profile.email }, 201);
   }
 
-  // DELETE
   if (method === "DELETE") {
     const { searchParams } = new URL(req.url || "", "http://localhost");
     const id = searchParams.get("id");
-    if (!id) return json({ error: "id query param is required" }, 400);
+    if (!id) return sendJson(res, { error: "id query param is required" }, 400);
 
     const { data, error } = await deleteRow("registration_codes", "id", id);
-    if (error) return json({ error: "Failed to delete code", detail: error }, 500);
-    if (!data || data.length === 0) return json({ error: "Code not found" }, 404);
-    return json({ success: true, id });
+    if (error) return sendJson(res, { error: "Failed to delete code", detail: error }, 500);
+    if (!data || data.length === 0) return sendJson(res, { error: "Code not found" }, 404);
+    return sendJson(res, { success: true, id });
   }
 
-  return json({ error: `Method ${method} not allowed` }, 405);
+  return sendJson(res, { error: `Method ${method} not allowed` }, 405);
 });

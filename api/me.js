@@ -2,18 +2,17 @@
 // Returns the caller's profile based on their Bearer token.
 
 const { getProfile, listTable } = require("./_lib/supabase");
-const { getUserFromRequest, json } = require("./_lib/auth");
+const { getUserFromRequest, sendJson } = require("./_lib/auth");
 
-module.exports = async (req, ctx) => {
+module.exports = async (req, res) => {
   const { user, error, status } = await getUserFromRequest(req);
-  if (error) return json({ error }, status);
+  if (error) return sendJson(res, { error }, status);
 
   const { data: profile, error: pErr } = await getProfile(user.id);
   if (pErr) {
-    return json({ error: "Failed to load profile", detail: pErr }, 500);
+    return sendJson(res, { error: "Failed to load profile", detail: pErr }, 500);
   }
 
-  // Load store info if user is a mitra (not admin)
   let store = null;
   if (profile && profile.role !== "admin") {
     const { data: stores, error: storeErr } = await listTable("stores", {
@@ -24,7 +23,7 @@ module.exports = async (req, ctx) => {
     if (!storeErr && stores && stores.length > 0) store = stores[0];
   }
 
-  return json({
+  return sendJson(res, {
     user: {
       id: user.id,
       email: user.email,

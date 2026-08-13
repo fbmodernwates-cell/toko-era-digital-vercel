@@ -1,5 +1,6 @@
 // Auth helpers for Vercel serverless functions.
 // Verifies the caller's JWT, loads their profile, and enforces admin role.
+// Uses Express-style (req, res) signature — NOT the Edge/Workers object-return pattern.
 
 const {
   getUserByAccessToken,
@@ -32,7 +33,6 @@ async function getUserFromRequest(req) {
 
 /**
  * Like getUserFromRequest, but also enforces that the user has admin role.
- * Returns { user, profile, error, status }.
  */
 async function requireAdmin(req) {
   const { user, error, status } = await getUserFromRequest(req);
@@ -65,42 +65,49 @@ async function requireAdmin(req) {
   return { user, profile, error: null, status: 200 };
 }
 
-/** Standard JSON response helper. */
-function json(body, status = 200) {
-  return {
-    statusCode: status,
-    headers: {
-      "Content-Type": "application/json; charset=utf-8",
-      "Cache-Control": "no-store",
-    },
-    body: JSON.stringify(body),
-  };
+/**
+ * Express-style response helper: sends a JSON response and ends the stream.
+ */
+function sendJson(res, body, status = 200) {
+  res.statusCode = status;
+  res.setHeader("Content-Type", "application/json; charset=utf-8");
+  res.setHeader("Cache-Control", "no-store");
+  res.end(JSON.stringify(body));
 }
 
-/** Convenience: wrap an async handler that receives { req, user, profile } and returns JSON. */
+/**
+ * Convenience: wrap an admin-only handler that receives { req, res, user, profile }.
+ * Signature is Express-style: module.exports = withAdmin(async ({ req, res, user, profile }) => {...})
+ */
 function withAdmin(handler) {
-  return async (req, _ctx) => {
+  return async (req, res) => {
     try {
       const { user, profile, error, status } = await requireAdmin(req);
-      if (error) return json({ error }, status);
-      return await handler({ req, user, profile });
+      if (error) {
+        sendJson(res, { error }, status);
+        return;
+      }
+      await handler({ req, res, user, profile });
     } catch (err) {
       console.error("[api] withAdmin error:", err);
-      return json({ error: "Internal server error", detail: String(err) }, 500);
+      sendJson(res, { error: "Internal server error", detail: String(err) }, 500);
     }
   };
 }
 
-/** Convenience: wrap an async handler for any authenticated user (not just admin). */
+/** Convenience: wrap an authenticated-user handler. */
 function withUser(handler) {
-  return async (req, _ctx) => {
+  return async (req, res) => {
     try {
       const { user, error, status } = await getUserFromRequest(req);
-      if (error) return json({ error }, status);
-      return await handler({ req, user });
+      if (error) {
+        sendJson(res, { error }, status);
+        return;
+      }
+      await handler({ req, res, user });
     } catch (err) {
       console.error("[api] withUser error:", err);
-      return json({ error: "Internal server error", detail: String(err) }, 500);
+      sendJson(res, { error: "Internal server error", detail: String(err) }, 500);
     }
   };
 }
@@ -108,7 +115,7 @@ function withUser(handler) {
 module.exports = {
   getUserFromRequest,
   requireAdmin,
-  json,
+  sendJson,
   withAdmin,
   withUser,
   ADMIN_ROLES,

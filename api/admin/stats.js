@@ -1,13 +1,10 @@
 // GET /api/admin/stats
-// Returns dashboard counts: users, codes (active/used), products, stores.
+// Returns dashboard counts.
 
-const {
-  countRows,
-  listTable,
-} = require("../_lib/supabase");
-const { withAdmin, json } = require("../_lib/auth");
+const { countRows, listTable } = require("../_lib/supabase");
+const { withAdmin, sendJson } = require("../_lib/auth");
 
-module.exports = withAdmin(async ({ profile }) => {
+module.exports = withAdmin(async ({ req, res, profile }) => {
   const [usersRes, codesRes, productsRes, storesRes, bannedRes] = await Promise.all([
     countRows("profiles"),
     listTable("registration_codes", { select: "id,is_used", limit: 1000 }),
@@ -24,7 +21,7 @@ module.exports = withAdmin(async ({ profile }) => {
   const productsActive = productsRes.data?.filter((p) => p.is_active).length || 0;
   const productsInactive = productsTotal - productsActive;
 
-  return json({
+  return sendJson(res, {
     requestedBy: profile.email,
     counts: {
       users: usersRes.count || 0,

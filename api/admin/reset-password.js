@@ -1,12 +1,9 @@
 // POST /api/admin/reset-password
-// Body: { userId: string, newPassword?: string }
+// Body: { userId, newPassword? }
 
 const crypto = require("crypto");
-const {
-  adminGetUserById,
-  adminUpdateUserById,
-} = require("../_lib/supabase");
-const { withAdmin, json } = require("../_lib/auth");
+const { adminGetUserById, adminUpdateUserById } = require("../_lib/supabase");
+const { withAdmin, sendJson } = require("../_lib/auth");
 
 function parseBody(req) {
   try {
@@ -26,20 +23,19 @@ function generateTempPassword(length = 16) {
   return out;
 }
 
-module.exports = withAdmin(async ({ req, profile }) => {
+module.exports = withAdmin(async ({ req, res, profile }) => {
   const body = parseBody(req);
-  if (!body) return json({ error: "Invalid JSON body" }, 400);
+  if (!body) return sendJson(res, { error: "Invalid JSON body" }, 400);
 
   const userId = String(body.userId || "").trim();
-  if (!userId) return json({ error: "userId is required" }, 400);
+  if (!userId) return sendJson(res, { error: "userId is required" }, 400);
   if (userId === profile.id) {
-    return json({ error: "Use the settings page to change your own password" }, 400);
+    return sendJson(res, { error: "Use the settings page to change your own password" }, 400);
   }
 
-  // Verify target user exists via Auth Admin API
   const { data: targetUser, error: targetErr } = await adminGetUserById(userId);
   if (targetErr || !targetUser) {
-    return json({ error: "Target user not found", detail: targetErr || "User not found" }, 404);
+    return sendJson(res, { error: "Target user not found", detail: targetErr || "User not found" }, 404);
   }
 
   let newPassword = body.newPassword ? String(body.newPassword) : null;
@@ -53,15 +49,12 @@ module.exports = withAdmin(async ({ req, profile }) => {
     password: newPassword,
   });
   if (updateErr) {
-    return json({ error: "Failed to reset password", detail: updateErr }, 500);
+    return sendJson(res, { error: "Failed to reset password", detail: updateErr }, 500);
   }
 
-  return json({
+  return sendJson(res, {
     success: true,
-    target: {
-      id: targetUser.id,
-      email: targetUser.email,
-    },
+    target: { id: targetUser.id, email: targetUser.email },
     generated,
     ...(generated ? { temporaryPassword: newPassword } : {}),
     note: generated
