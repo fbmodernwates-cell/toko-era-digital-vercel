@@ -11,58 +11,101 @@
     <style>
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--shadow-lg:0 12px 40px rgba(0,0,0,.10);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
+        html,body{width:100%;overflow-x:hidden}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
-        .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
-        .nav-brand{font-weight:900;font-size:1.2rem;color:var(--primary-dark);text-decoration:none}
-        .nav-right{display:flex;align-items:center;gap:16px}
-        .nav-user{font-size:.9rem;color:var(--text-muted)}
-        .nav-user strong{color:var(--text)}
-        .btn-logout{padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;border:2px solid var(--error);color:var(--error);background:transparent;cursor:pointer;font-family:inherit;transition:all .2s}
+        .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;position:sticky;top:0;background:var(--bg);z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+        .nav-brand{font-weight:900;font-size:1rem;color:var(--primary-dark);text-decoration:none}
+        .nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .nav-user{font-size:.8rem;color:var(--text-muted);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .nav-user strong{color:var(--text);display:block;font-size:.85rem;overflow:hidden;text-overflow:ellipsis}
+        .btn-logout{padding:6px 12px;border-radius:6px;font-weight:600;font-size:.78rem;border:2px solid var(--error);color:var(--error);background:transparent;cursor:pointer;font-family:inherit}
         .btn-logout:hover{background:var(--error);color:#fff}
+        .container{width:100%;max-width:1200px;margin:0 auto;padding:12px 12px 80px}
+        .header{margin-bottom:16px}
+        .header h1{font-size:1.4rem;font-weight:800;margin-bottom:2px}
+        .header p{color:var(--text-muted);font-size:.85rem}
 
-        .container{max-width:960px;margin:0 auto;padding:20px 24px 60px}
-        .header{margin-bottom:28px}
-        .header h1{font-size:1.6rem;font-weight:800;margin-bottom:4px}
-        .header p{color:var(--text-muted);font-size:.92rem}
+        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px}
+        .stat{background:var(--bg-card);border-radius:12px;padding:12px;box-shadow:var(--shadow);text-align:center}
+        .stat h3{font-size:1.2rem;font-weight:800;color:var(--primary-dark)}
+        .stat p{font-size:.7rem;color:var(--text-muted);margin-top:2px}
 
-        /* STATS */
-        .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:28px}
-        .stat{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);text-align:center}
-        .stat h3{font-size:1.4rem;font-weight:800;color:var(--primary-dark)}
-        .stat p{font-size:.8rem;color:var(--text-muted);margin-top:2px}
-
-        /* GRID PRODUK */
-        .section-title{font-size:1.1rem;font-weight:700;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
-        .btn-add{padding:8px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.85rem;cursor:pointer;font-family:inherit}
+        .section-title{font-size:1rem;font-weight:700;margin:24px 0 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+        .btn-add{padding:8px 14px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.82rem;cursor:pointer;font-family:inherit;flex-shrink:0}
         .btn-add:hover{background:var(--primary-dark)}
-        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-bottom:32px}
-        .product-card{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow);transition:all .3s}
+        .btn-add-secondary{background:var(--success)}
+        .btn-add-secondary:hover{background:#059669}
+
+        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px;margin-bottom:24px}
+        .product-card{background:var(--bg-card);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);transition:all .3s;display:flex;flex-direction:column}
         .product-card:hover{transform:translateY(-3px);box-shadow:var(--shadow-lg)}
-        .product-card .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.7rem;font-weight:700;margin-bottom:8px}
+        .product-card img{width:100%;height:140px;object-fit:cover;background:#f3f4f6;display:block}
+        .product-card .ph{width:100%;height:140px;background:linear-gradient(135deg,#E5E7EB,#f3f4f6);display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:.78rem}
+        .product-card .body{padding:10px;flex:1;display:flex;flex-direction:column;gap:3px}
+        .product-card .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:.68rem;font-weight:700;margin-bottom:4px;align-self:flex-start}
         .badge-admin{background:#DBEAFE;color:#1E40AF}
         .badge-user{background:#D1FAE5;color:#065F46}
-        .product-card h3{font-size:.95rem;font-weight:700;margin-bottom:4px}
-        .product-card .price{font-size:1rem;font-weight:800;color:var(--primary-dark);margin-bottom:4px}
-        .product-card .stock{font-size:.8rem;color:var(--text-muted)}
-        .product-card .desc{font-size:.82rem;color:var(--text-muted);margin-top:6px;line-height:1.5}
-        .empty{text-align:center;padding:32px;color:var(--text-muted);font-size:.9rem}
+        .badge-mine{background:#FEF3C7;color:#92400E}
+        .product-card .name{font-size:.88rem;font-weight:700;line-height:1.3}
+        .product-card .price{font-size:.95rem;font-weight:800;color:var(--primary-dark)}
+        .product-card .stock{font-size:.72rem;color:var(--text-muted)}
+        .product-card .desc{font-size:.76rem;color:var(--text-muted);margin-top:4px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+        .product-card .commission{background:#FEF3C7;color:#92400E;border-radius:6px;padding:3px 8px;font-size:.7rem;font-weight:600;margin-top:4px;display:inline-block;align-self:flex-start}
+        .product-card .seller{font-size:.72rem;color:var(--text-muted);margin-top:2px;font-style:italic}
+        .product-card .actions{display:flex;gap:6px;padding:6px 10px;border-top:1px solid #E5E7EB}
+        .product-card .actions button{flex:1;padding:5px 8px;border:none;border-radius:5px;font-size:.72rem;font-weight:600;cursor:pointer;font-family:inherit}
+        .empty{text-align:center;padding:24px 12px;color:var(--text-muted);font-size:.85rem;background:var(--bg-card);border-radius:12px}
 
         /* MODAL */
-        .modal-overlay{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100;align-items:center;justify-content:center;padding:24px}
+        .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;align-items:flex-end;justify-content:center;padding:0}
         .modal-overlay.active{display:flex}
-        .modal{background:var(--bg-card);border-radius:var(--radius);padding:32px;width:100%;max-width:440px;box-shadow:var(--shadow-lg)}
-        .modal h2{font-size:1.2rem;font-weight:800;margin-bottom:16px}
-        .form-group{margin-bottom:14px}
-        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px}
-        .form-group input,.form-group textarea{width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:8px;font-size:.9rem;font-family:inherit;background:var(--bg)}
-        .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--primary)}
+        .modal{background:var(--bg-card);border-radius:20px 20px 0 0;padding:20px 16px;width:100%;max-width:440px;max-height:90vh;overflow-y:auto}
+        .modal h2{font-size:1.1rem;font-weight:800;margin-bottom:12px}
+        .form-group{margin-bottom:12px}
+        .form-group label{display:block;font-weight:600;font-size:.8rem;margin-bottom:4px}
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:2px solid #E5E7EB;border-radius:8px;font-size:.88rem;font-family:inherit;background:var(--bg)}
+        .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--primary)}
         .form-group textarea{resize:vertical;min-height:60px}
-        .modal-actions{display:flex;gap:10px;margin-top:16px}
-        .modal-actions button{flex:1;padding:10px;border-radius:8px;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit}
+        .modal-actions{display:flex;gap:8px;margin-top:12px}
+        .modal-actions button{flex:1;padding:10px;border-radius:8px;font-weight:600;font-size:.88rem;cursor:pointer;font-family:inherit}
         .btn-cancel{background:#E5E7EB;border:none;color:var(--text)}
         .btn-save{background:var(--primary);border:none;color:#fff}
 
-        @media(max-width:600px){.stats{grid-template-columns:1fr}.product-grid{grid-template-columns:1fr}}
+        /* IMAGE UPLOAD */
+        .img-preview{width:100%;height:140px;border:2px dashed #E5E7EB;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.82rem;overflow:hidden;position:relative;cursor:pointer}
+        .img-preview img{width:100%;height:100%;object-fit:cover}
+        .img-preview .clear-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
+        .upload-progress{height:6px;background:#E5E7EB;border-radius:3px;overflow:hidden;margin-top:6px;display:none}
+        .upload-progress.show{display:block}
+        .upload-progress .bar{height:100%;background:var(--primary);width:0;transition:width .2s}
+
+        /* STORE FORM */
+        .store-form{background:var(--bg-card);padding:16px;border-radius:12px;box-shadow:var(--shadow);margin-bottom:24px}
+        .store-form button{padding:10px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.88rem;cursor:pointer;font-family:inherit;width:100%}
+
+        /* DESKTOP */
+        @media(min-width:768px){
+            .container{padding:24px 24px 80px}
+            .stats{grid-template-columns:repeat(3,1fr);gap:14px}
+            .stat{padding:20px}
+            .stat h3{font-size:1.4rem}
+            .stat p{font-size:.8rem}
+            .header h1{font-size:1.6rem}
+            .header p{font-size:.92rem}
+            .nav{padding:20px 24px}
+            .nav-brand{font-size:1.2rem}
+            .nav-user{font-size:.9rem;max-width:none}
+            .nav-user strong{font-size:.9rem}
+            .btn-logout{padding:8px 16px;font-size:.85rem}
+            .product-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px}
+            .product-card img,.product-card .ph{height:180px}
+            .modal-overlay{align-items:center;padding:24px}
+            .modal{border-radius:20px;padding:32px;max-height:none}
+            .modal h2{font-size:1.2rem}
+            .store-form{padding:24px}
+            .store-form button{width:auto}
+        }
+        @media(max-width:768px){input,select,textarea{font-size:16px}}
     </style>
 </head>
 <body>
@@ -77,24 +120,26 @@
     <div class="container">
         <div class="header">
             <h1>Dashboard Toko</h1>
-            <p>Kelola toko online Anda</p>
+            <p>Kelola toko online Sobat Era Digital</p>
         </div>
 
         <div class="stats">
             <div class="stat"><h3 id="totalAdmin">0</h3><p>Produk Etalase</p></div>
+            <div class="stat"><h3 id="totalAllSobat">0</h3><p>Produk Semua Sobat</p></div>
             <div class="stat"><h3 id="totalUser">0</h3><p>Produk Saya</p></div>
-            <div class="stat"><h3 id="totalAll">0</h3><p>Total Produk Toko</p></div>
         </div>
 
-        <!-- PRODUK ETALASE (dari Admin) -->
-        <div class="section-title">Produk Etalase</div>
+        <!-- PRODUK ETALASE (dari Admin — Sobat bisa jual & dapat komisi) -->
+        <div class="section-title">
+            Produk Etalase <span style="font-size:.78rem;color:var(--text-muted);font-weight:400">jual & dapat komisi</span>
+        </div>
         <div id="adminProducts" class="product-grid">
             <div class="empty">Memuat produk...</div>
         </div>
 
-        <!-- PRODUK SENDIRI -->
+        <!-- PRODUK SEMUA SOBAT (termasuk milik sendiri) -->
         <div class="section-title">
-            Produk Saya
+            Produk Semua Sobat Era Digital
             <button class="btn-add" id="addMyProductBtn">+ Tambah Produk</button>
         </div>
         <div id="userProducts" class="product-grid">
@@ -103,13 +148,13 @@
 
         <!-- PROFIL TOKO -->
         <div class="section-title">Profil Toko</div>
-        <div id="storeCard" class="product-grid" style="margin-bottom:32px">
+        <div id="storeCard" class="product-grid" style="margin-bottom:16px">
             <div class="empty">Memuat profil toko...</div>
         </div>
 
         <!-- FORM PROFIL TOKO -->
         <div class="section-title">Ubah Profil Toko</div>
-        <form id="storeForm" style="background:var(--bg-card);padding:20px;border-radius:var(--radius);box-shadow:var(--shadow);max-width:640px;margin-bottom:32px">
+        <form id="storeForm" class="store-form">
             <div class="form-group">
                 <label>Nama Toko</label>
                 <input type="text" id="storeName" placeholder="Contoh: Toko Sejahtera" required>
@@ -118,15 +163,25 @@
                 <label>Deskripsi</label>
                 <textarea id="storeDesc" placeholder="Deskripsi singkat toko..."></textarea>
             </div>
-            <button type="submit" class="btn-save" style="padding:10px 16px;border-radius:8px;border:none;background:var(--primary);color:#fff;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit">Simpan Profil Toko</button>
+            <button type="submit">Simpan Profil Toko</button>
         </form>
     </div>
 
     <!-- MODAL TAMBAH PRODUK -->
     <div class="modal-overlay" id="productModal">
         <div class="modal">
-            <h2>Tambah Produk Saya</h2>
+            <h2 id="modalTitle">Tambah Produk Saya</h2>
             <form id="productForm">
+                <div class="form-group">
+                    <label>Foto Produk</label>
+                    <div class="img-preview" id="productImgPreview" onclick="document.getElementById('pImage').click()">
+                        <span id="imgPlaceholder">📷 Klik untuk upload foto</span>
+                        <img id="imgPreviewEl" style="display:none" alt="Preview">
+                        <button type="button" class="clear-btn" id="clearImgBtn" style="display:none">×</button>
+                    </div>
+                    <input type="file" id="pImage" accept="image/*" style="display:none">
+                    <div class="upload-progress" id="uploadProgress"><div class="bar"></div></div>
+                </div>
                 <div class="form-group">
                     <label>Nama Produk</label>
                     <input type="text" id="pName" placeholder="Contoh: Kaos Distro" required>
@@ -152,16 +207,12 @@
     </div>
 
     <script>
-                let currentUser = null;
+        let currentUser = null;
+        let uploadedImageUrl = null;
 
         async function getUser() {
             const { data: { user } } = await supabase.auth.getUser();
             return user;
-        }
-
-        async function signOut() {
-            const { error } = await supabase.auth.signOut();
-            return error;
         }
 
         async function init() {
@@ -202,21 +253,79 @@
             currentUser = user;
             document.getElementById('userName').textContent = user.user_metadata?.full_name || user.email;
             loadAdminProducts();
-            loadUserProducts();
+            loadAllUserProducts();
             loadStore();
         }
 
-        // PROFIL TOKO
+        // ============ IMAGE UPLOAD ============
+        document.getElementById('pImage').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran foto maksimal 2MB');
+                e.target.value = '';
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('imgPreviewEl').src = ev.target.result;
+                document.getElementById('imgPreviewEl').style.display = 'block';
+                document.getElementById('imgPlaceholder').style.display = 'none';
+                document.getElementById('clearImgBtn').style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+
+            const prog = document.getElementById('uploadProgress');
+            const bar = prog.querySelector('.bar');
+            prog.classList.add('show');
+            bar.style.width = '30%';
+
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            const fileName = `${currentUser.id}/${Date.now()}.${fileExt}`;
+            const { error } = await supabase.storage.from('product-images').upload(fileName, file, { cacheControl: '3600' });
+            bar.style.width = '80%';
+
+            if (error) {
+                alert('Gagal upload foto: ' + error.message);
+                prog.classList.remove('show');
+                clearImageUpload();
+                return;
+            }
+            const { data: urlData } = supabase.storage.from('product-images').getPublicUrl(fileName);
+            uploadedImageUrl = urlData.publicUrl;
+            bar.style.width = '100%';
+            setTimeout(() => prog.classList.remove('show'), 500);
+        });
+
+        document.getElementById('clearImgBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearImageUpload();
+        });
+
+        function clearImageUpload() {
+            uploadedImageUrl = null;
+            document.getElementById('pImage').value = '';
+            document.getElementById('imgPreviewEl').style.display = 'none';
+            document.getElementById('imgPreviewEl').src = '';
+            document.getElementById('imgPlaceholder').style.display = 'block';
+            document.getElementById('clearImgBtn').style.display = 'none';
+        }
+
+        // ============ PROFIL TOKO ============
         async function loadStore() {
             const { data } = await supabase.from('stores').select('*').eq('user_id', currentUser.id).maybeSingle();
             const card = document.getElementById('storeCard');
             if (!data) {
                 card.innerHTML = '<div class="empty">Belum ada profil toko. Isi form di bawah untuk membuatnya.</div>';
-                document.getElementById('storeName').value = '';
-                document.getElementById('storeDesc').value = '';
                 return;
             }
-            card.innerHTML = '<div class="product-card"><span class="badge badge-user">Toko Saya</span><h3>' + escapeHtml(data.store_name || 'Toko Saya') + '</h3><div class="desc">' + escapeHtml(data.description || '') + '</div></div>';
+            card.innerHTML = `<div class="product-card" style="grid-column:1/-1">
+                <div class="body" style="padding:16px">
+                    <span class="badge badge-user">Toko Saya</span>
+                    <h3 style="font-size:1.05rem;font-weight:700;margin-top:6px">${escapeHtml(data.store_name || 'Toko Saya')}</h3>
+                    <div class="desc" style="font-size:.85rem;margin-top:6px">${escapeHtml(data.description || '')}</div>
+                </div>
+            </div>`;
             document.getElementById('storeName').value = data.store_name || '';
             document.getElementById('storeDesc').value = data.description || '';
         }
@@ -235,54 +344,92 @@
             loadStore();
         });
 
-        // PRODUK ETALASE (Admin)
+        // ============ PRODUK ETALASE (Admin — Sobat bisa jual & dapat komisi) ============
         async function loadAdminProducts() {
             const { data } = await supabase.from('admin_products').select('*').eq('is_active', true).order('created_at', { ascending: false });
             const container = document.getElementById('adminProducts');
             if (!data || data.length === 0) {
-                container.innerHTML = '<div class="empty">Belum ada produk etalase</div>';
+                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk etalase</div>';
                 document.getElementById('totalAdmin').textContent = '0';
-                updateTotal();
                 return;
             }
             document.getElementById('totalAdmin').textContent = data.length;
             let html = '';
             data.forEach(p => {
-                html += '<div class="product-card"><span class="badge badge-admin">Etalase</span><h3>' + escapeHtml(p.name) + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + escapeHtml(p.description) + '</div>' : '') + '</div>';
+                let commissionTag = '';
+                if (p.commission_type === 'percent' && p.commission_percent > 0) {
+                    commissionTag = `<div class="commission">💰 Komisi Sobat: ${p.commission_percent}%</div>`;
+                } else if (p.commission_type === 'fixed' && p.commission_fixed > 0) {
+                    commissionTag = `<div class="commission">💰 Komisi Sobat: Rp ${Number(p.commission_fixed).toLocaleString('id')}</div>`;
+                }
+                const img = p.image_url
+                    ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" loading="lazy">`
+                    : `<div class="ph">📷 Tanpa foto</div>`;
+                html += `<div class="product-card">
+                    ${img}
+                    <div class="body">
+                        <span class="badge badge-admin">Etalase</span>
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        <div class="price">Rp ${Number(p.price).toLocaleString('id')}</div>
+                        <div class="stock">Stok: ${p.stock}${p.category ? ' · ' + escapeHtml(p.category) : ''}</div>
+                        ${commissionTag}
+                        ${p.description ? `<div class="desc">${escapeHtml(p.description)}</div>` : ''}
+                    </div>
+                </div>`;
             });
             container.innerHTML = html;
-            updateTotal();
         }
 
-        // PRODUK SENDIRI (User)
-        async function loadUserProducts() {
-            const { data } = await supabase.from('user_products').select('*').eq('user_id', currentUser.id).order('created_at', { ascending: false });
+        // ============ SEMUA PRODUK SOBAT (termasuk milik sendiri) ============
+        async function loadAllUserProducts() {
+            // user_products is now publicly readable via RLS policy
+            const { data } = await supabase.from('user_products')
+                .select('*, user_id')
+                .order('created_at', { ascending: false });
             const container = document.getElementById('userProducts');
             if (!data || data.length === 0) {
-                container.innerHTML = '<div class="empty">Belum ada produk. Klik "Tambah Produk" untuk mulai!</div>';
+                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk. Klik "Tambah Produk" untuk mulai!</div>';
                 document.getElementById('totalUser').textContent = '0';
-                updateTotal();
+                document.getElementById('totalAllSobat').textContent = '0';
                 return;
             }
-            document.getElementById('totalUser').textContent = data.length;
+            document.getElementById('totalAllSobat').textContent = data.length;
+            const myProducts = data.filter(p => p.user_id === currentUser.id);
+            document.getElementById('totalUser').textContent = myProducts.length;
+
             let html = '';
             data.forEach(p => {
-                html += '<div class="product-card"><span class="badge badge-user">Produk Saya</span><h3>' + escapeHtml(p.name) + '</h3><div class="price">Rp ' + Number(p.price).toLocaleString('id') + '</div><div class="stock">Stok: ' + p.stock + '</div>' + (p.description ? '<div class="desc">' + escapeHtml(p.description) + '</div>' : '') + '<div style="margin-top:10px;display:flex;gap:10px"><button onclick="editMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--primary-dark);cursor:pointer;font-weight:600;font-size:.8rem">Edit</button><button onclick="deleteMyProduct(\'' + p.id + '\')" style="background:none;border:none;color:var(--error);cursor:pointer;font-weight:600;font-size:.8rem">Hapus</button></div></div>';
+                const isMine = p.user_id === currentUser.id;
+                const badge = isMine
+                    ? '<span class="badge badge-mine">Produk Saya</span>'
+                    : '<span class="badge badge-user">Sobat Lain</span>';
+                const img = p.image_url
+                    ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" loading="lazy">`
+                    : `<div class="ph">📷 Tanpa foto</div>`;
+                const actions = isMine ? `
+                    <div class="actions">
+                        <button onclick="editMyProduct('${p.id}')" style="background:none;border:none;color:var(--primary-dark);cursor:pointer;font-weight:600">Edit</button>
+                        <button onclick="deleteMyProduct('${p.id}')" style="background:none;border:none;color:var(--error);cursor:pointer;font-weight:600">Hapus</button>
+                    </div>` : '';
+                html += `<div class="product-card">
+                    ${img}
+                    <div class="body">
+                        ${badge}
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        <div class="price">Rp ${Number(p.price).toLocaleString('id')}</div>
+                        <div class="stock">Stok: ${p.stock}</div>
+                        ${p.description ? `<div class="desc">${escapeHtml(p.description)}</div>` : ''}
+                    </div>
+                    ${actions}
+                </div>`;
             });
             container.innerHTML = html;
-            updateTotal();
-        }
-
-        function updateTotal() {
-            const a = parseInt(document.getElementById('totalAdmin').textContent) || 0;
-            const u = parseInt(document.getElementById('totalUser').textContent) || 0;
-            document.getElementById('totalAll').textContent = a + u;
         }
 
         async function deleteMyProduct(id) {
             if (!confirm('Hapus produk ini?')) return;
             await supabase.from('user_products').delete().eq('id', id);
-            loadUserProducts();
+            loadAllUserProducts();
         }
 
         async function editMyProduct(id) {
@@ -292,11 +439,20 @@
             document.getElementById('pPrice').value = data.price || '';
             document.getElementById('pStock').value = data.stock || '';
             document.getElementById('pDesc').value = data.description || '';
+            uploadedImageUrl = data.image_url || null;
+            if (data.image_url) {
+                document.getElementById('imgPreviewEl').src = data.image_url;
+                document.getElementById('imgPreviewEl').style.display = 'block';
+                document.getElementById('imgPlaceholder').style.display = 'none';
+                document.getElementById('clearImgBtn').style.display = 'flex';
+            }
+            document.getElementById('modalTitle').textContent = 'Edit Produk';
             document.getElementById('productModal').classList.add('active');
             window.__editProductId = id;
         }
 
         function escapeHtml(text) {
+            if (!text) return '';
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
@@ -304,25 +460,34 @@
 
         // MODAL
         document.getElementById('addMyProductBtn').addEventListener('click', () => {
+            document.getElementById('productForm').reset();
+            clearImageUpload();
+            document.getElementById('modalTitle').textContent = 'Tambah Produk Saya';
             document.getElementById('productModal').classList.add('active');
+            window.__editProductId = null;
         });
         document.getElementById('cancelBtn').addEventListener('click', () => {
             window.__editProductId = null;
             document.getElementById('productModal').classList.remove('active');
+            clearImageUpload();
         });
 
         document.getElementById('productForm').addEventListener('submit', async (e) => {
             e.preventDefault();
+            const name = document.getElementById('pName').value.trim();
+            const price = parseFloat(document.getElementById('pPrice').value) || 0;
+            const stock = parseInt(document.getElementById('pStock').value) || 0;
+            const description = document.getElementById('pDesc').value.trim() || null;
+            if (!name || price <= 0) {
+                alert('Nama dan harga wajib diisi');
+                return;
+            }
             const payload = {
                 user_id: currentUser.id,
-                name: document.getElementById('pName').value.trim(),
-                price: document.getElementById('pPrice').value,
-                stock: document.getElementById('pStock').value,
-                description: document.getElementById('pDesc').value.trim()
+                name, price, stock, description,
+                image_url: uploadedImageUrl
             };
-            if (window.__editProductId) {
-                payload.id = window.__editProductId;
-            }
+            if (window.__editProductId) payload.id = window.__editProductId;
             const { error } = window.__editProductId
                 ? await supabase.from('user_products').update(payload).eq('id', window.__editProductId)
                 : await supabase.from('user_products').insert(payload);
@@ -330,11 +495,12 @@
             window.__editProductId = null;
             document.getElementById('productModal').classList.remove('active');
             e.target.reset();
-            loadUserProducts();
+            clearImageUpload();
+            loadAllUserProducts();
         });
 
         document.getElementById('logoutBtn').addEventListener('click', async () => {
-            await signOut();
+            await supabase.auth.signOut();
             window.location.href = '/index.html';
         });
 

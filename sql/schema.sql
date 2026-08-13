@@ -95,6 +95,10 @@ CREATE TABLE IF NOT EXISTS admin_products (
   category TEXT,
   stock INTEGER DEFAULT 0,
   is_active BOOLEAN DEFAULT TRUE,
+  -- Komisi untuk Sobat Era Digital yang berhasil menjual produk admin
+  commission_type TEXT DEFAULT 'percent',     -- 'percent' | 'fixed'
+  commission_percent NUMERIC(5,2) DEFAULT 0,  -- 0-100 percent
+  commission_fixed NUMERIC DEFAULT 0,         -- fixed amount in Rp
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -120,6 +124,7 @@ CREATE TABLE IF NOT EXISTS user_products (
   name TEXT NOT NULL,
   price NUMERIC NOT NULL DEFAULT 0,
   description TEXT,
+  image_url TEXT,        -- URL gambar dari Supabase Storage
   stock INTEGER DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -128,6 +133,38 @@ ALTER TABLE user_products ENABLE ROW LEVEL SECURITY;
 
 CREATE POLICY "Users can CRUD their own products" ON user_products
   FOR ALL USING (auth.uid() = user_id);
+
+-- Anyone can view user_products (produk Sobat terlihat oleh semua Sobat)
+DROP POLICY IF EXISTS "Anyone can view user_products" ON user_products;
+CREATE POLICY "Anyone can view user_products" ON user_products
+  FOR SELECT USING (true);
+
+-- ============================================
+-- STORAGE: product-images bucket
+-- ============================================
+INSERT INTO storage.buckets (id, name, public) 
+VALUES ('product-images', 'product-images', true)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Users can upload product images" ON storage.objects;
+CREATE POLICY "Users can upload product images" ON storage.objects
+  FOR INSERT TO authenticated
+  WITH CHECK (bucket_id = 'product-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+DROP POLICY IF EXISTS "Anyone can read product images" ON storage.objects;
+CREATE POLICY "Anyone can read product images" ON storage.objects
+  FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'product-images');
+
+DROP POLICY IF EXISTS "Users can update their product images" ON storage.objects;
+CREATE POLICY "Users can update their product images" ON storage.objects
+  FOR UPDATE TO authenticated
+  USING (bucket_id = 'product-images' AND (storage.foldername(name))[1] = auth.uid()::text);
+
+DROP POLICY IF EXISTS "Users can delete their product images" ON storage.objects;
+CREATE POLICY "Users can delete their product images" ON storage.objects
+  FOR DELETE TO authenticated
+  USING (bucket_id = 'product-images' AND (storage.foldername(name))[1] = auth.uid()::text);
 
 -- 5. Tabel Toko
 CREATE TABLE IF NOT EXISTS stores (

@@ -9,89 +9,149 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.38.4/dist/umd/supabase.min.js"></script>
     <script src="js/supabase-config.js"></script>
     <style>
+        /* MOBILE-FIRST LAYOUT — full width on phone */
         :root{--primary:#D2691E;--primary-dark:#8B4513;--primary-light:#F4A460;--bg:#FDF6EC;--bg-card:#FFF;--text:#1A1A2E;--text-muted:#6B7280;--success:#10B981;--error:#EF4444;--shadow:0 4px 24px rgba(0,0,0,.06);--radius:16px}
         *{margin:0;padding:0;box-sizing:border-box}
+        html,body{width:100%;overflow-x:hidden}
         body{font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;background:var(--bg);color:var(--text);line-height:1.7;min-height:100vh}
-        .nav{max-width:960px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:20px 24px}
-        .nav-brand{font-weight:900;font-size:1.2rem;color:var(--primary-dark);text-decoration:none}
-        .nav-right{display:flex;align-items:center;gap:16px}
-        .nav-user{font-size:.9rem;color:var(--text-muted)}
-        .nav-user strong{color:var(--text)}
-        .btn-logout{padding:8px 16px;border-radius:8px;font-weight:600;font-size:.85rem;border:2px solid var(--error);color:var(--error);background:transparent;cursor:pointer;font-family:inherit;transition:all .2s}
+        .nav{max-width:1200px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;position:sticky;top:0;background:var(--bg);z-index:50;box-shadow:0 1px 0 rgba(0,0,0,.04)}
+        .nav-brand{font-weight:900;font-size:1rem;color:var(--primary-dark);text-decoration:none}
+        .nav-right{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+        .nav-user{font-size:.8rem;color:var(--text-muted);white-space:nowrap;max-width:140px;overflow:hidden;text-overflow:ellipsis}
+        .nav-user strong{color:var(--text);display:block;font-size:.85rem;overflow:hidden;text-overflow:ellipsis}
+        .btn-logout{padding:6px 12px;border-radius:6px;font-weight:600;font-size:.78rem;border:2px solid var(--error);color:var(--error);background:transparent;cursor:pointer;font-family:inherit;transition:all .2s}
         .btn-logout:hover{background:var(--error);color:#fff}
-        .container{max-width:960px;margin:0 auto;padding:20px 24px 60px}
-        .header{margin-bottom:32px}
-        .header h1{font-size:1.8rem;font-weight:800;margin-bottom:4px}
-        .header p{color:var(--text-muted);font-size:.95rem}
+        .container{width:100%;max-width:1200px;margin:0 auto;padding:12px 12px 80px}
+        .header{margin-bottom:16px}
+        .header h1{font-size:1.4rem;font-weight:800;margin-bottom:2px}
+        .header p{color:var(--text-muted);font-size:.85rem}
 
-        /* TABS */
-        .tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap}
-        .tab{padding:10px 20px;border-radius:8px;border:none;background:#E5E7EB;color:var(--text);font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;transition:all .2s}
+        /* TABS — horizontal scroll on mobile */
+        .tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:4px;scrollbar-width:thin}
+        .tab{padding:10px 14px;border-radius:8px;border:none;background:#E5E7EB;color:var(--text);font-weight:600;font-size:.82rem;cursor:pointer;font-family:inherit;transition:all .2s;white-space:nowrap;flex-shrink:0}
         .tab.active{background:var(--primary);color:#fff}
         .tab:hover:not(.active){background:#D1D5DB}
         .tab-content{display:none}
         .tab-content.active{display:block}
 
         /* CARDS */
-        .card{background:var(--bg-card);border-radius:var(--radius);padding:28px;box-shadow:var(--shadow);margin-bottom:20px}
-        .card h2{font-size:1.2rem;font-weight:800;margin-bottom:16px}
+        .card{background:var(--bg-card);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);margin-bottom:16px}
+        .card h2{font-size:1.05rem;font-weight:800;margin-bottom:12px}
 
         /* FORM */
-        .form-row{display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;margin-bottom:16px}
-        .form-group{flex:1;min-width:200px}
-        .form-group label{display:block;font-weight:600;font-size:.85rem;margin-bottom:6px}
-        .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 14px;border:2px solid #E5E7EB;border-radius:8px;font-size:.9rem;font-family:inherit;background:var(--bg);transition:border .2s}
-        .form-group input:focus,.form-group textarea:focus{outline:none;border-color:var(--primary)}
+        .form-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;margin-bottom:12px}
+        .form-group{flex:1;min-width:140px}
+        .form-group label{display:block;font-weight:600;font-size:.8rem;margin-bottom:4px}
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:10px 12px;border:2px solid #E5E7EB;border-radius:8px;font-size:.88rem;font-family:inherit;background:var(--bg);transition:border .2s}
+        .form-group input:focus,.form-group textarea:focus,.form-group select:focus{outline:none;border-color:var(--primary)}
         .form-group textarea{resize:vertical;min-height:60px}
-        .btn{padding:10px 20px;border-radius:8px;border:none;font-weight:600;font-size:.9rem;cursor:pointer;font-family:inherit;transition:all .2s}
+        .btn{padding:10px 16px;border-radius:8px;border:none;font-weight:600;font-size:.88rem;cursor:pointer;font-family:inherit;transition:all .2s}
         .btn-primary{background:var(--primary);color:#fff}
         .btn-primary:hover{background:var(--primary-dark)}
         .btn-success{background:var(--success);color:#fff}
         .btn-success:hover{background:#059669}
         .btn-danger{background:var(--error);color:#fff}
         .btn-danger:hover{background:#DC2626}
-        .btn-sm{padding:6px 12px;font-size:.8rem}
+        .btn-sm{padding:6px 10px;font-size:.78rem}
 
         /* CODE DISPLAY */
-        .code-box{background:var(--bg);border:2px dashed var(--primary);border-radius:12px;padding:20px;text-align:center;margin:16px 0}
-        .code-box .code{font-size:2rem;font-weight:900;color:var(--primary-dark);letter-spacing:4px;font-family:monospace}
-        .code-box p{color:var(--text-muted);font-size:.85rem;margin-top:8px}
+        .code-box{background:var(--bg);border:2px dashed var(--primary);border-radius:12px;padding:14px;text-align:center;margin:12px 0}
+        .code-box .code{font-size:1.6rem;font-weight:900;color:var(--primary-dark);letter-spacing:3px;font-family:monospace;word-break:break-all}
+        .code-box p{color:var(--text-muted);font-size:.78rem;margin-top:6px}
 
-        /* TABLE */
-        .table-wrap{overflow-x:auto}
-        table{width:100%;border-collapse:collapse}
-        th{text-align:left;padding:12px 8px;font-size:.8rem;color:var(--text-muted);border-bottom:2px solid #E5E7EB}
-        td{padding:12px 8px;border-bottom:1px solid #E5E7EB;font-size:.9rem}
-        .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:.75rem;font-weight:700}
+        /* TABLE — convert to card grid on mobile */
+        .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+        table{width:100%;border-collapse:collapse;min-width:560px}
+        th{text-align:left;padding:10px 8px;font-size:.78rem;color:var(--text-muted);border-bottom:2px solid #E5E7EB;white-space:nowrap}
+        td{padding:10px 8px;border-bottom:1px solid #E5E7EB;font-size:.86rem;vertical-align:top}
+        .badge{display:inline-block;padding:3px 8px;border-radius:20px;font-size:.72rem;font-weight:700;white-space:nowrap}
         .badge-green{background:#D1FAE5;color:#065F46}
         .badge-red{background:#FEE2E2;color:#DC2626}
         .badge-yellow{background:#FEF3C7;color:#92400E}
-        .empty{text-align:center;padding:32px;color:var(--text-muted)}
+        .empty{text-align:center;padding:32px;color:var(--text-muted);font-size:.88rem}
 
-        /* STATS GRID */
-        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-bottom:24px}
-        .stat-card{background:var(--bg-card);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
-        .stat-card .label{font-size:.8rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-        .stat-card .value{font-size:2rem;font-weight:900;color:var(--primary-dark);line-height:1}
-        .stat-card .sub{font-size:.78rem;color:var(--text-muted);margin-top:6px}
+        /* PRODUCT CARDS GRID — mobile 1 col, desktop 2-3 cols */
+        .product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;margin-top:12px}
+        .product-card{background:var(--bg-card);border-radius:12px;padding:0;box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
+        .product-card img{width:100%;height:140px;object-fit:cover;background:#f3f4f6;display:block}
+        .product-card .ph{width:100%;height:140px;background:linear-gradient(135deg,#E5E7EB,#f3f4f6);display:flex;align-items:center;justify-content:center;color:#9CA3AF;font-size:.8rem}
+        .product-card .body{padding:12px;flex:1;display:flex;flex-direction:column;gap:4px}
+        .product-card .name{font-size:.92rem;font-weight:700;line-height:1.3}
+        .product-card .price{font-size:1rem;font-weight:800;color:var(--primary-dark)}
+        .product-card .meta{font-size:.78rem;color:var(--text-muted)}
+        .product-card .commission{background:#FEF3C7;color:#92400E;border-radius:6px;padding:4px 8px;font-size:.72rem;font-weight:600;margin-top:4px;display:inline-block;align-self:flex-start}
+        .product-card .actions{display:flex;gap:6px;padding:8px 12px;border-top:1px solid #E5E7EB}
+        .product-card .actions button{flex:1;padding:6px 8px;border:none;border-radius:6px;font-size:.78rem;font-weight:600;cursor:pointer;font-family:inherit}
+
+        /* STATS GRID — mobile 2 cols, desktop 4 cols */
+        .stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:16px}
+        .stat-card{background:var(--bg-card);border-radius:12px;padding:12px;box-shadow:var(--shadow)}
+        .stat-card .label{font-size:.7rem;color:var(--text-muted);font-weight:600;text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px}
+        .stat-card .value{font-size:1.4rem;font-weight:900;color:var(--primary-dark);line-height:1}
+        .stat-card .sub{font-size:.68rem;color:var(--text-muted);margin-top:4px}
 
         /* MODAL */
-        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+        .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;justify-content:center;z-index:1000;padding:0}
         .modal-overlay.show{display:flex}
-        .modal{background:#fff;border-radius:var(--radius);max-width:520px;width:100%;padding:32px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-        .modal h3{font-size:1.3rem;font-weight:800;margin-bottom:8px}
-        .modal p{color:var(--text-muted);font-size:.9rem;margin-bottom:16px}
-        .modal .temp-pass{background:var(--bg);border:2px dashed var(--primary);border-radius:10px;padding:16px;text-align:center;font-family:monospace;font-size:1.4rem;font-weight:700;color:var(--primary-dark);letter-spacing:2px;margin:16px 0;user-select:all;word-break:break-all}
-        .modal .copy-btn{display:inline-block;margin-top:8px;padding:8px 16px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.85rem}
+        .modal{background:#fff;border-radius:20px 20px 0 0;max-width:520px;width:100%;padding:20px 16px;box-shadow:0 -10px 40px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+        .modal h3{font-size:1.1rem;font-weight:800;margin-bottom:8px}
+        .modal p{color:var(--text-muted);font-size:.82rem;margin-bottom:12px}
+        .modal .temp-pass{background:var(--bg);border:2px dashed var(--primary);border-radius:10px;padding:14px;text-align:center;font-family:monospace;font-size:1.2rem;font-weight:700;color:var(--primary-dark);letter-spacing:1.5px;margin:12px 0;user-select:all;word-break:break-all}
+        .modal .copy-btn{display:inline-block;margin-top:8px;padding:8px 14px;background:var(--primary);color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;font-size:.82rem}
         .modal .copy-btn:hover{background:var(--primary-dark)}
-        .modal .warn{background:#FEF3C7;color:#92400E;border-radius:8px;padding:10px 14px;font-size:.82rem;margin-top:8px}
-        .modal .close-btn{display:block;margin:20px auto 0;padding:10px 24px;background:#E5E7EB;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit}
+        .modal .warn{background:#FEF3C7;color:#92400E;border-radius:8px;padding:8px 12px;font-size:.78rem;margin-top:8px}
+        .modal .close-btn{display:block;margin:16px auto 0;padding:10px 20px;background:#E5E7EB;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;width:100%}
 
         /* NAV LINKS */
-        .nav-link{font-size:.85rem;color:var(--primary-dark);text-decoration:none;font-weight:600;padding:8px 14px;border-radius:8px;transition:background .2s}
+        .nav-link{font-size:.78rem;color:var(--primary-dark);text-decoration:none;font-weight:600;padding:6px 10px;border-radius:6px;transition:background .2s;white-space:nowrap}
         .nav-link:hover{background:#FFEDD5}
 
-        @media(max-width:600px){.form-row{flex-direction:column}.form-group{min-width:100%}}
+        /* IMAGE UPLOAD */
+        .img-upload{display:flex;flex-direction:column;gap:8px}
+        .img-preview{width:100%;height:160px;border:2px dashed #E5E7EB;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;color:var(--text-muted);font-size:.85rem;overflow:hidden;position:relative}
+        .img-preview img{width:100%;height:100%;object-fit:cover}
+        .img-preview .clear-btn{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.6);color:#fff;border:none;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:1rem;line-height:1;display:flex;align-items:center;justify-content:center}
+        .upload-progress{height:6px;background:#E5E7EB;border-radius:3px;overflow:hidden;display:none}
+        .upload-progress.show{display:block}
+        .upload-progress .bar{height:100%;background:var(--primary);width:0;transition:width .2s}
+
+        /* COMMISSION GROUP */
+        .commission-group{background:var(--bg);border-radius:10px;padding:10px;margin-bottom:10px}
+        .commission-group label{font-weight:600;font-size:.8rem;margin-bottom:6px;display:block}
+        .commission-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+        .commission-row select{flex:1;min-width:100px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:6px;font-size:.85rem;font-family:inherit;background:#fff}
+        .commission-row input{flex:1;min-width:80px;padding:8px 10px;border:2px solid #E5E7EB;border-radius:6px;font-size:.85rem;font-family:inherit;background:#fff}
+        .commission-hint{font-size:.72rem;color:var(--text-muted);margin-top:6px}
+        .commission-preview{font-size:.78rem;color:var(--primary-dark);font-weight:600;margin-top:4px}
+
+        /* DESKTOP LAYOUT (>768px) */
+        @media(min-width:768px){
+            .container{padding:24px 24px 80px}
+            .stats-grid{grid-template-columns:repeat(4,1fr);gap:16px}
+            .stat-card{padding:20px}
+            .stat-card .value{font-size:2rem}
+            .stat-card .label{font-size:.8rem}
+            .stat-card .sub{font-size:.78rem}
+            .card{padding:24px}
+            .card h2{font-size:1.2rem;margin-bottom:16px}
+            .header h1{font-size:1.8rem}
+            .header p{font-size:.95rem}
+            .nav{padding:20px 24px}
+            .nav-brand{font-size:1.2rem}
+            .nav-user{font-size:.9rem;max-width:none}
+            .nav-user strong{font-size:.9rem}
+            .btn-logout{padding:8px 16px;font-size:.85rem}
+            .nav-link{font-size:.85rem;padding:8px 14px}
+            .tab{padding:10px 20px;font-size:.9rem}
+            .modal-overlay{align-items:center;padding:24px}
+            .modal{border-radius:20px;padding:32px;max-height:none}
+            .modal .close-btn{width:auto;margin:20px auto 0}
+            .product-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+            .product-card img,.product-card .ph{height:180px}
+        }
+
+        /* prevent zoom on input focus iOS */
+        @media(max-width:768px){input,select,textarea{font-size:16px}}
     </style>
 </head>
 <body>
@@ -168,6 +228,16 @@
             <div class="card">
                 <h2>Tambah Produk Etalase</h2>
                 <form id="addProductForm">
+                    <div class="img-upload" style="margin-bottom:12px">
+                        <label style="font-weight:600;font-size:.8rem;margin-bottom:4px;display:block">Foto Produk</label>
+                        <div class="img-preview" id="productImgPreview" onclick="document.getElementById('pImage').click()">
+                            <span id="imgPlaceholder">📷 Klik untuk upload foto</span>
+                            <img id="imgPreviewEl" style="display:none" alt="Preview">
+                            <button type="button" class="clear-btn" id="clearImgBtn" style="display:none">×</button>
+                        </div>
+                        <input type="file" id="pImage" accept="image/*" style="display:none">
+                        <div class="upload-progress" id="uploadProgress"><div class="bar"></div></div>
+                    </div>
                     <div class="form-row">
                         <div class="form-group">
                             <label>Nama Produk</label>
@@ -195,25 +265,32 @@
                             <input type="number" id="pStock" placeholder="100" required>
                         </div>
                     </div>
-                    <div class="form-group" style="margin-bottom:16px">
+
+                    <div class="commission-group">
+                        <label>💰 Komisi untuk Sobat Era Digital yang Menjual</label>
+                        <div class="commission-row">
+                            <select id="commissionType">
+                                <option value="percent">Persen (%)</option>
+                                <option value="fixed">Nominal (Rp)</option>
+                            </select>
+                            <input type="number" id="commissionValue" placeholder="0" min="0" step="0.01" value="0">
+                        </div>
+                        <div class="commission-hint" id="commissionHint">Komisi 0% — Sobat tidak dapat keuntungan dari penjualan produk ini.</div>
+                        <div class="commission-preview" id="commissionPreview"></div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:12px">
                         <label>Deskripsi</label>
                         <textarea id="pDesc" placeholder="Deskripsi produk..."></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Tambah Produk</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%">Tambah Produk</button>
                 </form>
             </div>
 
             <div class="card">
                 <h2>Daftar Produk Etalase</h2>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Nama</th><th>Harga</th><th>Kategori</th><th>Stok</th><th>Status</th><th>Aksi</th></tr>
-                        </thead>
-                        <tbody id="productsList">
-                            <tr><td colspan="6" class="empty">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="product-grid" id="productsList">
+                    <div class="empty">Memuat data...</div>
                 </div>
             </div>
         </div>
@@ -222,18 +299,11 @@
         <div class="tab-content" id="tab-users">
             <div class="card">
                 <h2>Sobat Era Digital Terdaftar</h2>
-                <p style="color:var(--text-muted);font-size:.85rem;margin-bottom:16px">
-                    Aksi <strong>Reset Password</strong> memanggil endpoint <code>/api/admin/reset-password</code> dengan service role key di server-side.
+                <p style="color:var(--text-muted);font-size:.8rem;margin-bottom:12px">
+                    Aksi <strong>Reset Password</strong> memanggil endpoint <code>/api/admin/reset-password</code> di server-side.
                 </p>
-                <div class="table-wrap">
-                    <table>
-                        <thead>
-                            <tr><th>Nama</th><th>Email</th><th>WhatsApp</th><th>Tanggal Daftar</th><th>Status</th><th>Aksi</th></tr>
-                        </thead>
-                        <tbody id="usersList">
-                            <tr><td colspan="6" class="empty">Memuat data...</td></tr>
-                        </tbody>
-                    </table>
+                <div class="product-grid" id="usersList">
+                    <div class="empty" style="grid-column:1/-1">Memuat data...</div>
                 </div>
             </div>
         </div>
@@ -406,32 +476,182 @@
         }
 
         // ============ PRODUK ETALASE ============
+
+        // Image upload preview
+        let uploadedImageUrl = null;
+        document.getElementById('pImage').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) {
+                alert('Ukuran foto maksimal 2MB');
+                e.target.value = '';
+                return;
+            }
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('imgPreviewEl').src = ev.target.result;
+                document.getElementById('imgPreviewEl').style.display = 'block';
+                document.getElementById('imgPlaceholder').style.display = 'none';
+                document.getElementById('clearImgBtn').style.display = 'flex';
+            };
+            reader.readAsDataURL(file);
+
+            // Upload to Supabase Storage
+            const prog = document.getElementById('uploadProgress');
+            const bar = prog.querySelector('.bar');
+            prog.classList.add('show');
+            bar.style.width = '30%';
+
+            const user = adminUser;
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+            const { data, error } = await supabase.storage
+                .from('product-images')
+                .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+            bar.style.width = '80%';
+
+            if (error) {
+                alert('Gagal upload foto: ' + error.message);
+                prog.classList.remove('show');
+                clearImageUpload();
+                return;
+            }
+
+            // Get public URL
+            const { data: urlData } = supabase.storage
+                .from('product-images')
+                .getPublicUrl(fileName);
+
+            uploadedImageUrl = urlData.publicUrl;
+            bar.style.width = '100%';
+            setTimeout(() => prog.classList.remove('show'), 500);
+        });
+
+        document.getElementById('clearImgBtn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            clearImageUpload();
+        });
+
+        function clearImageUpload() {
+            uploadedImageUrl = null;
+            document.getElementById('pImage').value = '';
+            document.getElementById('imgPreviewEl').style.display = 'none';
+            document.getElementById('imgPreviewEl').src = '';
+            document.getElementById('imgPlaceholder').style.display = 'block';
+            document.getElementById('clearImgBtn').style.display = 'none';
+        }
+
+        // Commission preview
+        function updateCommissionPreview() {
+            const type = document.getElementById('commissionType').value;
+            const value = parseFloat(document.getElementById('commissionValue').value) || 0;
+            const price = parseFloat(document.getElementById('pPrice').value) || 0;
+            const hint = document.getElementById('commissionHint');
+            const preview = document.getElementById('commissionPreview');
+
+            if (type === 'percent') {
+                if (value < 0 || value > 100) {
+                    hint.textContent = '⚠️ Persen harus 0-100';
+                    preview.textContent = '';
+                    return;
+                }
+                const earnings = price * value / 100;
+                hint.textContent = `Sobat yang jual produk ini akan dapat ${value}% dari harga jual.`;
+                preview.textContent = price > 0
+                    ? `Contoh: harga Rp ${price.toLocaleString('id')} → komisi Sobat Rp ${earnings.toLocaleString('id', { maximumFractionDigits: 0 })}`
+                    : '';
+            } else {
+                if (value > price && price > 0) {
+                    hint.textContent = '⚠️ Komisi melebihi harga produk!';
+                    preview.textContent = '';
+                    return;
+                }
+                hint.textContent = `Sobat yang jual produk ini akan dapat Rp ${value.toLocaleString('id')} per item terjual.`;
+                preview.textContent = price > 0
+                    ? `Contoh: harga Rp ${price.toLocaleString('id')} → komisi Sobat Rp ${value.toLocaleString('id')}`
+                    : '';
+            }
+        }
+        document.getElementById('commissionType').addEventListener('change', updateCommissionPreview);
+        document.getElementById('commissionValue').addEventListener('input', updateCommissionPreview);
+        document.getElementById('pPrice').addEventListener('input', updateCommissionPreview);
+
         document.getElementById('addProductForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const { error } = await supabase.from('admin_products').insert({
+            const commissionType = document.getElementById('commissionType').value;
+            const commissionValue = parseFloat(document.getElementById('commissionValue').value) || 0;
+
+            if (commissionType === 'percent' && (commissionValue < 0 || commissionValue > 100)) {
+                alert('Komisi persen harus 0-100');
+                return;
+            }
+
+            const payload = {
                 name: document.getElementById('pName').value.trim(),
-                price: document.getElementById('pPrice').value,
+                price: parseFloat(document.getElementById('pPrice').value) || 0,
                 category: document.getElementById('pCategory').value,
-                stock: document.getElementById('pStock').value,
-                description: document.getElementById('pDesc').value.trim()
-            });
+                stock: parseInt(document.getElementById('pStock').value) || 0,
+                description: document.getElementById('pDesc').value.trim() || null,
+                image_url: uploadedImageUrl,
+                commission_type: commissionType,
+                commission_percent: commissionType === 'percent' ? commissionValue : 0,
+                commission_fixed: commissionType === 'fixed' ? commissionValue : 0,
+                is_active: true
+            };
+            const { error } = await supabase.from('admin_products').insert(payload);
             if (error) { alert('Gagal: ' + error.message); return; }
             e.target.reset();
+            clearImageUpload();
+            updateCommissionPreview();
             loadProducts();
         });
 
         async function loadProducts() {
             const { data } = await supabase.from('admin_products').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('productsList');
             if (!data || data.length === 0) {
-                document.getElementById('productsList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada produk</td></tr>';
+                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada produk</div>';
                 return;
             }
             let html = '';
             data.forEach(p => {
-                const status = p.is_active ? '<span class="badge badge-green">Aktif</span>' : '<span class="badge badge-yellow">Nonaktif</span>';
-                html += '<tr><td style="font-weight:600">' + p.name + '</td><td>Rp ' + Number(p.price).toLocaleString('id') + '</td><td>' + (p.category||'-') + '</td><td>' + p.stock + '</td><td>' + status + '</td><td><button class="btn btn-danger btn-sm" onclick="deleteProduct(\'' + p.id + '\')">Hapus</button></td></tr>';
+                const status = p.is_active
+                    ? '<span class="badge badge-green">Aktif</span>'
+                    : '<span class="badge badge-yellow">Nonaktif</span>';
+                let commissionTag = '';
+                if (p.commission_type === 'percent' && p.commission_percent > 0) {
+                    commissionTag = `<div class="commission">💰 Komisi Sobat: ${p.commission_percent}%</div>`;
+                } else if (p.commission_type === 'fixed' && p.commission_fixed > 0) {
+                    commissionTag = `<div class="commission">💰 Komisi Sobat: Rp ${Number(p.commission_fixed).toLocaleString('id')}</div>`;
+                }
+                const img = p.image_url
+                    ? `<img src="${p.image_url}" alt="${escapeHtml(p.name)}" loading="lazy">`
+                    : `<div class="ph">📷 Tanpa foto</div>`;
+                html += `<div class="product-card">
+                    ${img}
+                    <div class="body">
+                        <div class="name">${escapeHtml(p.name)}</div>
+                        <div class="price">Rp ${Number(p.price).toLocaleString('id')}</div>
+                        <div class="meta">${p.category || '-'} · Stok: ${p.stock}</div>
+                        ${commissionTag}
+                        <div style="margin-top:4px">${status}</div>
+                    </div>
+                    <div class="actions">
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Hapus</button>
+                    </div>
+                </div>`;
             });
-            document.getElementById('productsList').innerHTML = html;
+            container.innerHTML = html;
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         async function deleteProduct(id) {
@@ -442,28 +662,43 @@
 
         // ============ SOBAT ERA DIGITAL ============
         async function loadUsers() {
-            const { data: codes } = await supabase.from('registration_codes').select('used_by').not('used_by', 'is', null);
-            if (!codes || codes.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada Sobat Era Digital terdaftar</td></tr>';
-                return;
-            }
-            const userIds = [...new Set(codes.map(c => c.used_by))];
-            const { data: profiles } = await supabase.from('profiles').select('*').in('id', userIds);
+            // Load all profiles (admin can see all via RLS)
+            const { data: profiles } = await supabase.from('profiles').select('*').order('created_at', { ascending: false });
+            const container = document.getElementById('usersList');
             if (!profiles || profiles.length === 0) {
-                document.getElementById('usersList').innerHTML = '<tr><td colspan="6" class="empty">Belum ada Sobat Era Digital</td></tr>';
+                container.innerHTML = '<div class="empty" style="grid-column:1/-1">Belum ada Sobat Era Digital terdaftar</div>';
                 return;
             }
             let html = '';
             profiles.forEach(u => {
-                const status = u.is_banned ? '<span class="badge badge-red">Dibanned</span>' : '<span class="badge badge-green">Aktif</span>';
+                const status = u.is_banned
+                    ? '<span class="badge badge-red">Dibanned</span>'
+                    : '<span class="badge badge-green">Aktif</span>';
                 const banBtn = u.is_banned
-                    ? '<button class="btn btn-success btn-sm" onclick="restoreUser(\'' + u.id + '\')">Pulihkan</button>'
-                    : '<button class="btn btn-danger btn-sm" onclick="banUser(\'' + u.id + '\')">Banned</button>';
-                const resetBtn = '<button class="btn btn-sm" style="background:#3B82F6;color:#fff;margin-right:4px" onclick="resetPassword(\'' + u.id + '\', \'' + (u.email || '').replace(/'/g, "\\'") + '\')">Reset Password</button>';
-                const actions = '<div style="display:flex;gap:4px;flex-wrap:wrap">' + resetBtn + banBtn + '</div>';
-                html += '<tr><td>' + (u.full_name || '-') + '</td><td>' + u.email + '</td><td>' + (u.phone || '-') + '</td><td>' + new Date(u.created_at).toLocaleDateString('id') + '</td><td>' + status + '</td><td>' + actions + '</td></tr>';
+                    ? `<button class="btn btn-success btn-sm" onclick="restoreUser('${u.id}')">Pulihkan</button>`
+                    : `<button class="btn btn-danger btn-sm" onclick="banUser('${u.id}')">Banned</button>`;
+                const resetBtn = `<button class="btn btn-sm" style="background:#3B82F6;color:#fff" onclick="resetPassword('${u.id}', '${escapeHtml(u.email || '').replace(/'/g, "\\'")}')">Reset Password</button>`;
+                const isAdmin = String(u.role || '').toLowerCase() === 'admin';
+                const roleBadge = isAdmin
+                    ? '<span class="badge badge-yellow">Admin</span>'
+                    : '<span class="badge badge-green">Sobat</span>';
+                const avatar = (u.full_name || u.email || '?').charAt(0).toUpperCase();
+                html += `<div class="product-card">
+                    <div class="ph" style="height:80px;background:linear-gradient(135deg,#FFEDD5,#FED7AA);color:var(--primary-dark);font-size:2rem;font-weight:800">${escapeHtml(avatar)}</div>
+                    <div class="body">
+                        <div class="name">${escapeHtml(u.full_name || 'Tanpa Nama')}</div>
+                        <div class="meta">${escapeHtml(u.email || '')}</div>
+                        <div class="meta">${escapeHtml(u.phone || 'Tanpa WhatsApp')}</div>
+                        <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">${roleBadge} ${status}</div>
+                        <div class="meta" style="margin-top:4px">Daftar: ${new Date(u.created_at).toLocaleDateString('id')}</div>
+                    </div>
+                    <div class="actions" style="flex-direction:column">
+                        ${resetBtn}
+                        ${banBtn}
+                    </div>
+                </div>`;
             });
-            document.getElementById('usersList').innerHTML = html;
+            container.innerHTML = html;
         }
 
         // ============ RESET PASSWORD (via /api/admin/reset-password) ============
