@@ -214,11 +214,13 @@
 
                 const userId = authData.user.id;
 
-                // 2. Tandai kode terpakai
-                await supabase.from('registration_codes').update({
-                    is_used: true,
-                    used_by: userId
-                }).eq('id', verifiedCode.id);
+                // 2. Tandai kode terpakai (hanya jika kode ada di database, skip admin secret)
+                if (verifiedCode.id !== 'admin-secret') {
+                    await supabase.from('registration_codes').update({
+                        is_used: true,
+                        used_by: userId
+                    }).eq('id', verifiedCode.id);
+                }
 
                 // 3. Buat toko
                 await supabase.from('stores').insert({
