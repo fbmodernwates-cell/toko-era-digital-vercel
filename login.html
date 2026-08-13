@@ -88,8 +88,15 @@
                 }
 
                 const user = data.user;
-                const { data: profile, error: profileError } = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
-                if (profileError || profile?.is_banned) {
+                let profile = null;
+                try {
+                    const res = await supabase.from('profiles').select('is_banned').eq('id', user.id).maybeSingle();
+                    if (res.error) throw res.error;
+                    profile = res.data;
+                } catch (e) {
+                    console.error('Profile check failed', e);
+                }
+                if (profile?.is_banned) {
                     await supabase.auth.signOut();
                     showAlert('Akun Anda dibanned. Hubungi admin.', 'error');
                     submitBtn.disabled = false;
@@ -103,7 +110,9 @@
                     window.location.href = '/toko.html';
                 }
             } catch (err) {
-                showAlert('Terjadi kesalahan, coba lagi.', 'error');
+                console.error('Login error', err);
+                const msg = err?.message || 'Terjadi kesalahan, coba lagi.';
+                showAlert('Login error: ' + msg, 'error');
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Login';
             }
